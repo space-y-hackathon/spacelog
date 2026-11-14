@@ -1,41 +1,106 @@
+import artemisRocket from './assets/artemis.png'
+
+export const SHOWCASE_VEHICLES = [
+  {
+    id: 'artemis-1',
+    indexLabel: '1/3',
+    name: 'ARTEMIS I',
+    subtitle: 'UNCREWED LUNAR FLYBY TEST',
+    image: artemisRocket,
+    status: 'COMPLETED // 2022',
+  },
+  {
+    id: 'artemis-2',
+    indexLabel: '2/3',
+    name: 'ARTEMIS II',
+    subtitle: 'CREWED LUNAR FLYBY MISSION',
+    image: artemisRocket,
+    status: 'FLIGHT RECONSTRUCTION',
+  },
+  {
+    id: 'artemis-3',
+    indexLabel: '3/3',
+    name: 'ARTEMIS III',
+    subtitle: 'FUTURE LUNAR SOUTH POLE LANDING',
+    image: artemisRocket,
+    status: 'FUTURE PROFILE',
+  },
+]
+
 export const PANEL_CONTENT = {
   play: {
     kicker: 'FLIGHT PROGRAM',
     title: 'Choose your journey.',
-    description: 'Start a free sandbox session or follow a guided mission scenario.',
+    description: 'Start a free sandbox session or reconstruct an Artemis lunar mission.',
     options: [
       {
-        title: 'NEW SANDBOX',
-        description: 'Build and experiment without a fixed objective.',
-        nextPanel: 'sandbox',
-      },
-      {
         title: 'MISSION SCENARIO',
-        description: 'Take on a defined space mission objective.',
+        description: 'Reconstruct Artemis I, Artemis II, and future Artemis III trajectories.',
         nextPanel: 'scenario',
       },
+      {
+        title: 'NEW SANDBOX',
+        description: 'Build and experiment with orbital maneuvers without a fixed objective.',
+        nextPanel: 'sandbox',
+      },
     ],
+  },
+  scenario: {
+    kicker: 'ARTEMIS PROGRAM',
+    title: 'Select Mission Profile',
+    description: 'Choose a lunar mission reconstruction to simulate.',
+    options: [
+      {
+        title: 'ARTEMIS I // UNCREWED FLYBY',
+        description: 'Distant retrograde orbit test around the Moon and Earth reentry.',
+        nextPanel: 'launch_artemis_1',
+      },
+      {
+        title: 'ARTEMIS II // CREWED FLYBY',
+        description: 'Free-return lunar trajectory carrying astronauts around the far side.',
+        nextPanel: 'launch_artemis_2',
+      },
+      {
+        title: 'ARTEMIS III // LUNAR LANDING',
+        description: 'NRHO rendezvous and lunar south pole descent profile.',
+        nextPanel: 'launch_artemis_3',
+      },
+    ],
+    backPanel: 'play',
+  },
+  tutorial: {
+    kicker: 'LEARNING',
+    title: 'Tutorial',
+    description: 'Follow a guided tutorial to learn the basics of spacecraft design, Hohmann transfers, and lunar trajectory planning.',
+    backPanel: 'play',
   },
   settings: {
     kicker: 'PREFERENCES',
     title: 'Settings',
     description: 'Settings panel placeholder. Audio, graphics, and control options can be added here.',
   },
-  quit: {
-    kicker: 'END SESSION',
-    title: 'Leaving so soon?',
-    description: 'A browser game cannot close its own tab automatically. You can close this tab to exit.',
-  },
   sandbox: {
     kicker: 'COMING NEXT',
     title: 'Sandbox setup',
-    description: 'This is the next screen to design. Your main menu is ready to connect to it.',
+    description: 'Ready to connect to the 3D orbital sandbox scene.',
     backPanel: 'play',
   },
-  scenario: {
-    kicker: 'COMING NEXT',
-    title: 'Mission selection',
-    description: 'This is the next screen to design. Your main menu is ready to connect to it.',
-    backPanel: 'play',
+  launch_artemis_1: {
+    kicker: 'ARTEMIS I',
+    title: 'Mission Ready',
+    description: 'Ready to load Artemis I trajectory data into the 3D mission scene.',
+    backPanel: 'scenario',
+  },
+  launch_artemis_2: {
+    kicker: 'ARTEMIS II',
+    title: 'Mission Ready',
+    description: 'Ready to load Artemis II crewed flyby trajectory into the 3D mission scene.',
+    backPanel: 'scenario',
+  },
+  launch_artemis_3: {
+    kicker: 'ARTEMIS III',
+    title: 'Mission Ready',
+    description: 'Ready to load Artemis III lunar landing profile into the 3D mission scene.',
+    backPanel: 'scenario',
   },
 }

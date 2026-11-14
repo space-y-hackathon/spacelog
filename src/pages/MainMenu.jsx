@@ -1,115 +1,148 @@
-import { useState } from 'react'
-import MenuScene from '../game/scene/MenuScene'
+import { useEffect, useState } from 'react'
+import { PANEL_CONTENT, SHOWCASE_VEHICLES } from '../constants'
 import Button from '../components/Button'
 import Modal from '../components/Modal'
-import { PANEL_CONTENT } from '../constants'
+import RocketShowcase from '../components/RocketShowcase'
+import Starfield from '../components/Starfield'
 import './MainMenu.css'
 
 export default function MainMenu() {
-  const [panel, setPanel] = useState(null)
-  const panelContent = PANEL_CONTENT[panel]
+  const [activeVehicle, setActiveVehicle] = useState(0)
+  const [activePanel, setActivePanel] = useState(null)
+  const [typedDescription, setTypedDescription] = useState('')
+
+  const panel = activePanel ? PANEL_CONTENT[activePanel] : null
+
+  useEffect(() => {
+    if (!activePanel) return
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setActivePanel(null)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [activePanel])
+
+  useEffect(() => {
+    if (activePanel !== 'tutorial') {
+      setTypedDescription('')
+      return
+    }
+
+    const fullText = PANEL_CONTENT.tutorial.description
+    let index = 0
+    setTypedDescription('')
+
+    const timer = window.setInterval(() => {
+      index += 1
+      setTypedDescription(fullText.slice(0, index))
+      if (index >= fullText.length) {
+        window.clearInterval(timer)
+      }
+    }, 18)
+
+    return () => window.clearInterval(timer)
+  }, [activePanel])
 
   return (
     <main className="main-menu">
-      <section className="menu-left">
-        <header className="menu-header">
-          <div className="brand-mark">Δ</div>
-          <div className="brand-copy">
-            <span className="brand-name">DELTA-V</span>
-            <span className="brand-subtitle">SPACE MISSION SANDBOX</span>
+      <Starfield />
+
+      {/* Bumi bertekstur dengan rotasi halus & atmosfer 3D */}
+      <div className="earth-horizon" aria-hidden="true">
+        <div className="earth-surface" />
+        <div className="earth-atmosphere" />
+      </div>
+
+      <div className="menu-container">
+        <section className="menu-left" aria-label="Main Menu">
+          <div className="brand-card">
+            <div className="brand-icon-box" aria-hidden="true">
+              Δ
+            </div>
+            <div className="brand-text">
+              <span className="brand-title">DELTA-V</span>
+              <span className="brand-subtitle">SPACE MISSION SANDBOX</span>
+            </div>
           </div>
-        </header>
 
-        <div className="menu-main-content">
-          <div className="menu-eyebrow">
-            <span className="status-dot" />
-            YOUR NEXT FRONTIER AWAITS
+          <div className="menu-hero">
+            <h1 className="menu-title">SPACELOG</h1>
+
+            <div className="menu-eyebrow">
+              <span className="eyebrow-dot" aria-hidden="true" />
+              <span>YOUR NEXT FRONTIER AWAITS</span>
+            </div>
+
+            <p className="menu-description">
+              Design your spacecraft, master the physics of spaceflight, and write your own mission
+              history.
+            </p>
+
+            <div className="menu-actions-grid">
+              <Button variant="primary" onClick={() => setActivePanel('play')}>
+                PLAY
+              </Button>
+              <Button onClick={() => setActivePanel('tutorial')}>TUTORIAL</Button>
+              <Button
+                className="menu-btn-centered"
+                onClick={() => setActivePanel('settings')}
+              >
+                SETTINGS
+              </Button>
+            </div>
           </div>
+        </section>
 
-          <h1 className="menu-title">
-            BUILD.
-            <br />
-            LAUNCH.
-            <br />
-            <span>EXPLORE.</span>
-          </h1>
+        <section className="menu-right" aria-label="Spacecraft Preview">
+          <RocketShowcase
+            vehicles={SHOWCASE_VEHICLES}
+            activeIndex={activeVehicle}
+            onSelect={setActiveVehicle}
+          />
+        </section>
+      </div>
 
-          <p className="menu-description">
-            Design your spacecraft, master the physics of spaceflight,
-            and write your own mission history.
-          </p>
+      {panel && (
+        <Modal onClose={() => setActivePanel(null)}>
+          <span className="modal-kicker">{panel.kicker}</span>
+          <h2>{panel.title}</h2>
 
-          <nav className="menu-actions" aria-label="Main menu">
-            <Button onClick={() => setPanel('play')}>
-              <span>PLAY</span>
-              <span className="button-arrow">↗</span>
-            </Button>
-            <Button variant="secondary" onClick={() => setPanel('settings')}>
-              <span>SETTINGS</span>
-              <span className="button-symbol">⚙</span>
-            </Button>
-            <Button variant="quiet" onClick={() => setPanel('quit')}>
-              <span>QUIT</span>
-              <span className="button-symbol">×</span>
-            </Button>
-          </nav>
-        </div>
+          {activePanel === 'tutorial' ? (
+            <p>
+              <span className="visually-hidden">{panel.description}</span>
+              <span className="tutorial-typed-text" aria-hidden="true">
+                {typedDescription}
+              </span>
+            </p>
+          ) : (
+            <p>{panel.description}</p>
+          )}
 
-        <footer className="menu-footer">
-          <div>
-            <span className="footer-label">FLIGHT PROGRAM</span>
-            <span className="footer-value">SANDBOX INITIATIVE</span>
-          </div>
-          <div className="footer-version">PRE-ALPHA // v0.1</div>
-        </footer>
-      </section>
-
-      <section className="menu-right" aria-label="Spacecraft preview">
-        <div className="scene-topline">
-          <span>DEEP SPACE // VISUALIZATION</span>
-          <span className="scene-live"><i /> LIVE VIEW</span>
-        </div>
-
-        <div className="scene-canvas">
-          <MenuScene />
-        </div>
-
-        <div className="scene-caption scene-caption-top">
-          <span className="caption-index">01 / 03</span>
-          <span>EXPLORATION VEHICLE</span>
-        </div>
-
-        <div className="scene-caption scene-caption-bottom">
-          <div>
-            <span className="caption-label">CURRENT LOCATION</span>
-            <strong>LOW EARTH ORBIT</strong>
-          </div>
-          <div className="scene-coordinates">
-            <span className="caption-label">MISSION STATUS</span>
-            <strong>AWAITING COMMAND</strong>
-          </div>
-        </div>
-
-        <div className="scene-side-mark">D V / 001</div>
-      </section>
-
-      {panelContent && (
-        <Modal onClose={() => setPanel(null)}>
-          <span className="modal-kicker">{panelContent.kicker}</span>
-          <h2>{panelContent.title}</h2>
-          <p>{panelContent.description}</p>
-          {panelContent.options?.map((option) => (
+          {panel.options?.map((option) => (
             <button
+              key={option.title}
+              type="button"
               className="modal-option"
-              key={option.nextPanel}
-              onClick={() => setPanel(option.nextPanel)}
+              onClick={() => setActivePanel(option.nextPanel)}
             >
-              <span><strong>{option.title}</strong><small>{option.description}</small></span>
-              <b>↗</b>
+              <span>
+                <strong>{option.title}</strong>
+                <small>{option.description}</small>
+              </span>
+              <b>→</b>
             </button>
           ))}
-          {panelContent.backPanel && (
-            <button className="modal-back" onClick={() => setPanel(panelContent.backPanel)}>← BACK</button>
+
+          {panel.backPanel && (
+            <button
+              type="button"
+              className="modal-back"
+              onClick={() => setActivePanel(panel.backPanel)}
+            >
+              ← BACK
+            </button>
           )}
         </Modal>
       )}
