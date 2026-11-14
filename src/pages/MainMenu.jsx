@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import MenuScene from '../game/scene/MenuScene'
+import Button from '../components/Button'
 import './MainMenu.css'
 
 export default function MainMenu() {
@@ -36,18 +37,18 @@ export default function MainMenu() {
           </p>
 
           <nav className="menu-actions" aria-label="Main menu">
-            <button className="menu-button menu-button-primary" onClick={() => setPanel('play')}>
+            <Button onClick={() => setPanel('play')}>
               <span>PLAY</span>
               <span className="button-arrow">↗</span>
-            </button>
-            <button className="menu-button menu-button-secondary" onClick={() => setPanel('settings')}>
+            </Button>
+            <Button variant="secondary" onClick={() => setPanel('settings')}>
               <span>SETTINGS</span>
               <span className="button-symbol">⚙</span>
-            </button>
-            <button className="menu-button menu-button-quiet" onClick={() => setPanel('quit')}>
+            </Button>
+            <Button variant="quiet" onClick={() => setPanel('quit')}>
               <span>QUIT</span>
               <span className="button-symbol">×</span>
-            </button>
+            </Button>
           </nav>
         </div>
 
