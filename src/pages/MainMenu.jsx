@@ -1,9 +1,42 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import MenuScene from '../game/scene/MenuScene'
 import Button from '../components/Button'
 import Modal from '../components/Modal'
 import { PANEL_CONTENT } from '../constants'
 import './MainMenu.css'
+
+function TypedTutorialDescription({ text }) {
+  const characters = Array.from(text)
+  const [visibleCharacters, setVisibleCharacters] = useState(() =>
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches ? characters.length : 0,
+  )
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    let characterIndex = 0
+    const characterCount = Array.from(text).length
+    const timer = window.setInterval(() => {
+      characterIndex += 1
+      setVisibleCharacters(characterIndex)
+
+      if (characterIndex >= characterCount) window.clearInterval(timer)
+    }, 28)
+
+    return () => window.clearInterval(timer)
+  }, [text])
+
+  const isTyping = visibleCharacters < characters.length
+
+  return (
+    <p>
+      <span aria-hidden="true" className={isTyping ? 'tutorial-typed-text' : undefined}>
+        {characters.slice(0, visibleCharacters).join('')}
+      </span>
+      <span className="visually-hidden">{text}</span>
+    </p>
+  )
+}
 
 export default function MainMenu() {
   const [panel, setPanel] = useState(null)
@@ -42,15 +75,12 @@ export default function MainMenu() {
           <nav className="menu-actions" aria-label="Main menu">
             <Button onClick={() => setPanel('play')}>
               <span>PLAY</span>
-              <span className="button-arrow">↗</span>
             </Button>
-            <Button variant="secondary" onClick={() => setPanel('settings')}>
+            <Button variant="secondary" onClick={() => setPanel('tutorial')}>
+              <span>TUTORIAL</span>
+            </Button>
+            <Button variant="quiet" onClick={() => setPanel('settings')}>
               <span>SETTINGS</span>
-              <span className="button-symbol">⚙</span>
-            </Button>
-            <Button variant="quiet" onClick={() => setPanel('quit')}>
-              <span>QUIT</span>
-              <span className="button-symbol">×</span>
             </Button>
           </nav>
         </div>
@@ -97,7 +127,11 @@ export default function MainMenu() {
         <Modal onClose={() => setPanel(null)}>
           <span className="modal-kicker">{panelContent.kicker}</span>
           <h2>{panelContent.title}</h2>
-          <p>{panelContent.description}</p>
+          {panel === 'tutorial' ? (
+            <TypedTutorialDescription text={panelContent.description} />
+          ) : (
+            <p>{panelContent.description}</p>
+          )}
           {panelContent.options?.map((option) => (
             <button
               className="modal-option"

@@ -16,15 +16,16 @@ export const PANEL_CONTENT = {
       },
     ],
   },
+  tutorial: {
+    kicker: 'LEARNING',
+    title: 'Tutorial',
+    description: 'Follow a guided tutorial to learn the basics of spacecraft design and mission planning.',
+    backPanel: 'play',
+  },
   settings: {
     kicker: 'PREFERENCES',
     title: 'Settings',
     description: 'Settings panel placeholder. Audio, graphics, and control options can be added here.',
-  },
-  quit: {
-    kicker: 'END SESSION',
-    title: 'Leaving so soon?',
-    description: 'A browser game cannot close its own tab automatically. You can close this tab to exit.',
   },
   sandbox: {
     kicker: 'COMING NEXT',
