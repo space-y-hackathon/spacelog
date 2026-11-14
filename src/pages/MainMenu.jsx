@@ -1,48 +1,53 @@
 import { useEffect, useState } from 'react'
+import { PANEL_CONTENT, SHOWCASE_VEHICLES } from '../constants'
 import Button from '../components/Button'
 import Modal from '../components/Modal'
 import RocketShowcase from '../components/RocketShowcase'
-import { PANEL_CONTENT, SHOWCASE_VEHICLES } from '../constants'
+import Starfield from '../components/Starfield'
 import './MainMenu.css'
 
-function TypedTutorialDescription({ text }) {
-  const characters = Array.from(text)
-  const [visibleCharacters, setVisibleCharacters] = useState(() =>
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches ? characters.length : 0,
-  )
+export default function MainMenu() {
+  const [activeVehicle, setActiveVehicle] = useState(0)
+  const [activePanel, setActivePanel] = useState(null)
+  const [typedDescription, setTypedDescription] = useState('')
+
+  const panel = activePanel ? PANEL_CONTENT[activePanel] : null
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    let characterIndex = 0
-    const characterCount = Array.from(text).length
+    if (!activePanel) return
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setActivePanel(null)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [activePanel])
+
+  useEffect(() => {
+    if (activePanel !== 'tutorial') {
+      setTypedDescription('')
+      return
+    }
+
+    const fullText = PANEL_CONTENT.tutorial.description
+    let index = 0
+    setTypedDescription('')
+
     const timer = window.setInterval(() => {
-      characterIndex += 1
-      setVisibleCharacters(characterIndex)
-      if (characterIndex >= characterCount) window.clearInterval(timer)
-    }, 28)
+      index += 1
+      setTypedDescription(fullText.slice(0, index))
+      if (index >= fullText.length) {
+        window.clearInterval(timer)
+      }
+    }, 18)
+
     return () => window.clearInterval(timer)
-  }, [text])
-
-  const isTyping = visibleCharacters < characters.length
-
-  return (
-    <p>
-      <span aria-hidden="true" className={isTyping ? 'tutorial-typed-text' : undefined}>
-        {characters.slice(0, visibleCharacters).join('')}
-      </span>
-      <span className="visually-hidden">{text}</span>
-    </p>
-  )
-}
-
-export default function MainMenu() {
-  const [panel, setPanel] = useState(null)
-  const [vehicleIndex, setVehicleIndex] = useState(0)
-  const panelContent = PANEL_CONTENT[panel]
+  }, [activePanel])
 
   return (
     <main className="main-menu">
-      <div className="space-stars" aria-hidden="true" />
+      <Starfield />
 
       {/* Bumi bertekstur dengan rotasi halus & atmosfer 3D */}
       <div className="earth-horizon" aria-hidden="true">
@@ -51,22 +56,22 @@ export default function MainMenu() {
       </div>
 
       <div className="menu-container">
-        <section className="menu-left">
-          <header className="brand-card">
+        <section className="menu-left" aria-label="Main Menu">
+          <div className="brand-card">
             <div className="brand-icon-box" aria-hidden="true">
-              <span>Δ</span>
+              Δ
             </div>
             <div className="brand-text">
               <span className="brand-title">DELTA-V</span>
               <span className="brand-subtitle">SPACE MISSION SANDBOX</span>
             </div>
-          </header>
+          </div>
 
           <div className="menu-hero">
             <h1 className="menu-title">SPACELOG</h1>
 
             <div className="menu-eyebrow">
-              <span className="eyebrow-dot" />
+              <span className="eyebrow-dot" aria-hidden="true" />
               <span>YOUR NEXT FRONTIER AWAITS</span>
             </div>
 
@@ -75,48 +80,52 @@ export default function MainMenu() {
               history.
             </p>
 
-            <nav className="menu-actions-grid" aria-label="Main menu">
-              <Button variant="primary" onClick={() => setPanel('play')}>
+            <div className="menu-actions-grid">
+              <Button variant="primary" onClick={() => setActivePanel('play')}>
                 PLAY
               </Button>
-              <Button variant="secondary" onClick={() => setPanel('tutorial')}>
-                TUTORIAL
-              </Button>
+              <Button onClick={() => setActivePanel('tutorial')}>TUTORIAL</Button>
               <Button
-                variant="secondary"
                 className="menu-btn-centered"
-                onClick={() => setPanel('settings')}
+                onClick={() => setActivePanel('settings')}
               >
                 SETTINGS
               </Button>
-            </nav>
+            </div>
           </div>
         </section>
 
-        <section className="menu-right" aria-label="Spacecraft showcase">
+        <section className="menu-right" aria-label="Spacecraft Preview">
           <RocketShowcase
             vehicles={SHOWCASE_VEHICLES}
-            activeIndex={vehicleIndex}
-            onSelect={setVehicleIndex}
+            activeIndex={activeVehicle}
+            onSelect={setActiveVehicle}
           />
         </section>
       </div>
 
-      {panelContent && (
-        <Modal onClose={() => setPanel(null)}>
-          <span className="modal-kicker">{panelContent.kicker}</span>
-          <h2>{panelContent.title}</h2>
-          {panel === 'tutorial' ? (
-            <TypedTutorialDescription text={panelContent.description} />
+      {panel && (
+        <Modal onClose={() => setActivePanel(null)}>
+          <span className="modal-kicker">{panel.kicker}</span>
+          <h2>{panel.title}</h2>
+
+          {activePanel === 'tutorial' ? (
+            <p>
+              <span className="visually-hidden">{panel.description}</span>
+              <span className="tutorial-typed-text" aria-hidden="true">
+                {typedDescription}
+              </span>
+            </p>
           ) : (
-            <p>{panelContent.description}</p>
+            <p>{panel.description}</p>
           )}
-          {panelContent.options?.map((option) => (
+
+          {panel.options?.map((option) => (
             <button
+              key={option.title}
               type="button"
               className="modal-option"
-              key={option.nextPanel}
-              onClick={() => setPanel(option.nextPanel)}
+              onClick={() => setActivePanel(option.nextPanel)}
             >
               <span>
                 <strong>{option.title}</strong>
@@ -125,11 +134,12 @@ export default function MainMenu() {
               <b>→</b>
             </button>
           ))}
-          {panelContent.backPanel && (
+
+          {panel.backPanel && (
             <button
               type="button"
               className="modal-back"
-              onClick={() => setPanel(panelContent.backPanel)}
+              onClick={() => setActivePanel(panel.backPanel)}
             >
               ← BACK
             </button>
