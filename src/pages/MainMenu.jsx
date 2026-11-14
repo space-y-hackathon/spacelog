@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import MenuScene from '../game/scene/MenuScene'
 import Button from '../components/Button'
+import Modal from '../components/Modal'
+import { PANEL_CONTENT } from '../constants'
 import './MainMenu.css'
 
 export default function MainMenu() {
   const [panel, setPanel] = useState(null)
+  const panelContent = PANEL_CONTENT[panel]
 
   return (
     <main className="main-menu">
@@ -90,49 +93,25 @@ export default function MainMenu() {
         <div className="scene-side-mark">D V / 001</div>
       </section>
 
-      {panel && (
-        <div className="menu-modal-backdrop" onClick={() => setPanel(null)}>
-          <section className="menu-modal" onClick={(event) => event.stopPropagation()}>
-            <button className="modal-close" onClick={() => setPanel(null)} aria-label="Close">×</button>
-            {panel === 'play' && (
-              <>
-                <span className="modal-kicker">FLIGHT PROGRAM</span>
-                <h2>Choose your journey.</h2>
-                <p>Start a free sandbox session or follow a guided mission scenario.</p>
-                <button className="modal-option" onClick={() => setPanel('sandbox')}>
-                  <span><strong>NEW SANDBOX</strong><small>Build and experiment without a fixed objective.</small></span>
-                  <b>↗</b>
-                </button>
-                <button className="modal-option" onClick={() => setPanel('scenario')}>
-                  <span><strong>MISSION SCENARIO</strong><small>Take on a defined space mission objective.</small></span>
-                  <b>↗</b>
-                </button>
-              </>
-            )}
-            {panel === 'settings' && (
-              <>
-                <span className="modal-kicker">PREFERENCES</span>
-                <h2>Settings</h2>
-                <p>Settings panel placeholder. Audio, graphics, and control options can be added here.</p>
-              </>
-            )}
-            {panel === 'quit' && (
-              <>
-                <span className="modal-kicker">END SESSION</span>
-                <h2>Leaving so soon?</h2>
-                <p>A browser game cannot close its own tab automatically. You can close this tab to exit.</p>
-              </>
-            )}
-            {(panel === 'sandbox' || panel === 'scenario') && (
-              <>
-                <span className="modal-kicker">COMING NEXT</span>
-                <h2>{panel === 'sandbox' ? 'Sandbox setup' : 'Mission selection'}</h2>
-                <p>This is the next screen to design. Your main menu is ready to connect to it.</p>
-                <button className="modal-back" onClick={() => setPanel('play')}>← BACK</button>
-              </>
-            )}
-          </section>
-        </div>
+      {panelContent && (
+        <Modal onClose={() => setPanel(null)}>
+          <span className="modal-kicker">{panelContent.kicker}</span>
+          <h2>{panelContent.title}</h2>
+          <p>{panelContent.description}</p>
+          {panelContent.options?.map((option) => (
+            <button
+              className="modal-option"
+              key={option.nextPanel}
+              onClick={() => setPanel(option.nextPanel)}
+            >
+              <span><strong>{option.title}</strong><small>{option.description}</small></span>
+              <b>↗</b>
+            </button>
+          ))}
+          {panelContent.backPanel && (
+            <button className="modal-back" onClick={() => setPanel(panelContent.backPanel)}>← BACK</button>
+          )}
+        </Modal>
       )}
     </main>
   )
