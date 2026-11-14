@@ -9,6 +9,7 @@ import Button from "../components/Button";
 import Modal from "../components/Modal";
 import RocketShowcase from "../components/RocketShowcase";
 import Starfield from "../components/Starfield";
+import Logo from "../assets/logo_putih.png";
 
 import "./MainMenu.css";
 
@@ -102,7 +103,7 @@ export default function MainMenu({ onLaunch }) {
         <section className="menu-left" aria-label="Main Menu">
           <div className="brand-card">
             <div className="brand-icon-box" aria-hidden="true">
-              Δ
+              <img src={ Logo } alt="" />
             </div>
 
             <div className="brand-text">
