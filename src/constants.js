@@ -65,6 +65,11 @@ export const PANEL_CONTENT = {
         description: 'NRHO rendezvous and lunar south pole descent profile.',
         nextPanel: 'launch_artemis_3',
       },
+      {
+        title: "ARCHIVED // LUNAR 2014",
+        description: "Explore historical lunar trajectory and orbital coordinate datasets from 2014.",
+        nextPanel: "launch_lunar_2014",
+      },
     ],
     backPanel: 'play',
   },
@@ -102,5 +107,11 @@ export const PANEL_CONTENT = {
     title: 'Mission Ready',
     description: 'Ready to load Artemis III lunar landing profile into the 3D mission scene.',
     backPanel: 'scenario',
+  },
+  launch_lunar_2014: {
+    kicker: "ARCHIVED // LUNAR 2014",
+    title: "Mission Ready",
+    description: "Ready to load historical lunar trajectory and orbital data.",
+    backPanel: "scenario",
   },
 }
