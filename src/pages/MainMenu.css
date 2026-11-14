@@ -25,7 +25,6 @@ body,
 body {
   display: block;
   min-width: 320px;
-  overflow: hidden;
   background: #070d17;
 }
 
@@ -42,7 +41,6 @@ button {
   width: 100%;
   min-height: 100vh;
   min-height: 100svh;
-  overflow: hidden;
   isolation: isolate;
   background:
     radial-gradient(
@@ -269,7 +267,6 @@ button {
   position: relative;
   min-width: 0;
   min-height: 100vh;
-  overflow: hidden;
   background:
     radial-gradient(
       ellipse at 54% 46%,
