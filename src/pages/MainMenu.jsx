@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import MenuScene from '../game/scene/MenuScene'
 import Button from '../components/Button'
 import Modal from '../components/Modal'
-import { PANEL_CONTENT } from '../constants'
+import RocketShowcase from '../components/RocketShowcase'
+import { PANEL_CONTENT, SHOWCASE_VEHICLES } from '../constants'
 import './MainMenu.css'
 
 function TypedTutorialDescription({ text }) {
@@ -13,16 +13,13 @@ function TypedTutorialDescription({ text }) {
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
     let characterIndex = 0
     const characterCount = Array.from(text).length
     const timer = window.setInterval(() => {
       characterIndex += 1
       setVisibleCharacters(characterIndex)
-
       if (characterIndex >= characterCount) window.clearInterval(timer)
     }, 28)
-
     return () => window.clearInterval(timer)
   }, [text])
 
@@ -40,88 +37,70 @@ function TypedTutorialDescription({ text }) {
 
 export default function MainMenu() {
   const [panel, setPanel] = useState(null)
+  const [vehicleIndex, setVehicleIndex] = useState(0)
   const panelContent = PANEL_CONTENT[panel]
 
   return (
     <main className="main-menu">
-      <section className="menu-left">
-        <header className="menu-header">
-          <div className="brand-mark">Δ</div>
-          <div className="brand-copy">
-            <span className="brand-name">DELTA-V</span>
-            <span className="brand-subtitle">SPACE MISSION SANDBOX</span>
+      <div className="space-stars" aria-hidden="true" />
+
+      {/* Bumi bertekstur dengan rotasi halus & atmosfer 3D */}
+      <div className="earth-horizon" aria-hidden="true">
+        <div className="earth-surface" />
+        <div className="earth-atmosphere" />
+      </div>
+
+      <div className="menu-container">
+        <section className="menu-left">
+          <header className="brand-card">
+            <div className="brand-icon-box" aria-hidden="true">
+              <span>Δ</span>
+            </div>
+            <div className="brand-text">
+              <span className="brand-title">DELTA-V</span>
+              <span className="brand-subtitle">SPACE MISSION SANDBOX</span>
+            </div>
+          </header>
+
+          <div className="menu-hero">
+            <h1 className="menu-title">SPACELOG</h1>
+
+            <div className="menu-eyebrow">
+              <span className="eyebrow-dot" />
+              <span>YOUR NEXT FRONTIER AWAITS</span>
+            </div>
+
+            <p className="menu-description">
+              Design your spacecraft, master the physics of spaceflight, and write your own mission
+              history.
+            </p>
+
+            <nav className="menu-actions-grid" aria-label="Main menu">
+              <Button variant="primary" onClick={() => setPanel('play')}>
+                PLAY
+              </Button>
+              <Button variant="secondary" onClick={() => setPanel('tutorial')}>
+                TUTORIAL
+              </Button>
+              <Button
+                variant="secondary"
+                className="menu-btn-centered"
+                onClick={() => setPanel('settings')}
+              >
+                SETTINGS
+              </Button>
+            </nav>
           </div>
-        </header>
+        </section>
 
-        <div className="menu-main-content">
-          <div className="menu-eyebrow">
-            <span className="status-dot" />
-            YOUR NEXT FRONTIER AWAITS
-          </div>
-
-          <h1 className="menu-title">
-            BUILD.
-            <br />
-            LAUNCH.
-            <br />
-            <span>EXPLORE.</span>
-          </h1>
-
-          <p className="menu-description">
-            Design your spacecraft, master the physics of spaceflight,
-            and write your own mission history.
-          </p>
-
-          <nav className="menu-actions" aria-label="Main menu">
-            <Button onClick={() => setPanel('play')}>
-              <span>PLAY</span>
-            </Button>
-            <Button variant="secondary" onClick={() => setPanel('tutorial')}>
-              <span>TUTORIAL</span>
-            </Button>
-            <Button variant="quiet" onClick={() => setPanel('settings')}>
-              <span>SETTINGS</span>
-            </Button>
-          </nav>
-        </div>
-
-        <footer className="menu-footer">
-          <div>
-            <span className="footer-label">FLIGHT PROGRAM</span>
-            <span className="footer-value">SANDBOX INITIATIVE</span>
-          </div>
-          <div className="footer-version">PRE-ALPHA // v0.1</div>
-        </footer>
-      </section>
-
-      <section className="menu-right" aria-label="Spacecraft preview">
-        <div className="scene-topline">
-          <span>DEEP SPACE // VISUALIZATION</span>
-          <span className="scene-live"><i /> LIVE VIEW</span>
-        </div>
-
-        <div className="scene-canvas">
-          <MenuScene />
-        </div>
-
-        <div className="scene-caption scene-caption-top">
-          <span className="caption-index">01 / 03</span>
-          <span>EXPLORATION VEHICLE</span>
-        </div>
-
-        <div className="scene-caption scene-caption-bottom">
-          <div>
-            <span className="caption-label">CURRENT LOCATION</span>
-            <strong>LOW EARTH ORBIT</strong>
-          </div>
-          <div className="scene-coordinates">
-            <span className="caption-label">MISSION STATUS</span>
-            <strong>AWAITING COMMAND</strong>
-          </div>
-        </div>
-
-        <div className="scene-side-mark">D V / 001</div>
-      </section>
+        <section className="menu-right" aria-label="Spacecraft showcase">
+          <RocketShowcase
+            vehicles={SHOWCASE_VEHICLES}
+            activeIndex={vehicleIndex}
+            onSelect={setVehicleIndex}
+          />
+        </section>
+      </div>
 
       {panelContent && (
         <Modal onClose={() => setPanel(null)}>
@@ -134,16 +113,26 @@ export default function MainMenu() {
           )}
           {panelContent.options?.map((option) => (
             <button
+              type="button"
               className="modal-option"
               key={option.nextPanel}
               onClick={() => setPanel(option.nextPanel)}
             >
-              <span><strong>{option.title}</strong><small>{option.description}</small></span>
-              <b>↗</b>
+              <span>
+                <strong>{option.title}</strong>
+                <small>{option.description}</small>
+              </span>
+              <b>→</b>
             </button>
           ))}
           {panelContent.backPanel && (
-            <button className="modal-back" onClick={() => setPanel(panelContent.backPanel)}>← BACK</button>
+            <button
+              type="button"
+              className="modal-back"
+              onClick={() => setPanel(panelContent.backPanel)}
+            >
+              ← BACK
+            </button>
           )}
         </Modal>
       )}

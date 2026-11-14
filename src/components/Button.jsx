@@ -1,11 +1,13 @@
-import '../pages/MainMenu.css'
-
-const Button = ({ children, onClick, variant = 'primary' }) => {
+const Button = ({ children, onClick, variant = 'secondary', className = '' }) => {
   return (
-    <button className={`menu-button menu-button-${variant}`} onClick={onClick}>
+    <button
+      type="button"
+      className={`menu-btn menu-btn-${variant} ${className}`.trim()}
+      onClick={onClick}
+    >
       {children}
     </button>
-  );
-};
+  )
+}
 
-export default Button;
+export default Button
