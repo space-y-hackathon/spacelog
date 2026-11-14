@@ -1,0 +1,724 @@
+/* =========================================
+   GLOBAL & MAIN CONTAINER
+========================================= */
+
+.progress-scene,
+.progress-scene * {
+  box-sizing: border-box;
+}
+
+.progress-scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+
+  background: #080d16;
+  color: #ffffff;
+  font-family: inherit;
+}
+
+/* =========================================
+   3D VISUALIZATION
+========================================= */
+
+.mission-visual {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.mission-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.mission-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================
+   BACK BUTTON (kiri atas)
+========================================= */
+
+.progress-back {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  z-index: 10;
+
+  height: 42px;
+  padding: 0 16px;
+
+  border: 1px solid #334155;
+  border-radius: 8px;
+
+  background: rgba(15, 23, 42, 0.85);
+  color: white;
+
+  font-size: 15px;
+  white-space: nowrap;
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.progress-back:hover {
+  background: #1e293b;
+}
+
+/* =========================================
+   MISSION PROGRESS PANEL (kanan Back)
+========================================= */
+
+.mission-progress-panel {
+  position: absolute;
+  z-index: 5;
+
+  top: 20px;
+  left: 150px;
+  right: 24px;
+
+  padding: 16px 22px;
+
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+
+  background: rgba(8, 15, 28, 0.88);
+  backdrop-filter: blur(12px);
+}
+
+.progress-heading,
+.progress-labels,
+.progress-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-heading {
+  margin-bottom: 12px;
+
+  font-size: 13px;
+  letter-spacing: 1.5px;
+}
+
+.progress-heading strong {
+  color: #4ade80;
+  font-size: 20px;
+  letter-spacing: 0;
+}
+
+.progress-track {
+  position: relative;
+
+  height: 9px;
+  border-radius: 20px;
+
+  background: #263244;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+
+  background: #22c55e;
+
+  transition: width 0.1s linear;
+}
+
+.progress-indicator {
+  position: absolute;
+  top: 50%;
+
+  width: 15px;
+  height: 15px;
+
+  border: 3px solid white;
+  border-radius: 50%;
+
+  background: #22c55e;
+
+  transform: translate(-50%, -50%);
+}
+
+.progress-labels {
+  margin-top: 8px;
+
+  color: #94a3b8;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.progress-controls {
+  margin-top: 13px;
+
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.progress-controls div {
+  display: flex;
+  gap: 8px;
+}
+
+.progress-controls button {
+  width: 35px;
+  height: 32px;
+
+  border: 1px solid #475569;
+  border-radius: 6px;
+
+  background: #172235;
+  color: white;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.progress-controls button:hover {
+  background: #334155;
+}
+
+/* =========================================
+   ROCKET TELEMETRY - LEFT SIDEBAR
+========================================= */
+
+.rocket-statistics {
+  position: absolute;
+  z-index: 5;
+
+  top: 190px;
+  left: 24px;
+  bottom: 225px;
+
+  width: 225px;
+  height: 380px;
+  padding: 14px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+
+  background: rgba(8, 15, 28, 0.92);
+  backdrop-filter: blur(12px);
+
+  scrollbar-width: thin;
+  scrollbar-color: #475569 transparent;
+
+  transition:
+    transform 0.3s ease,
+    bottom 0.3s ease;
+}
+
+/* Sembunyi ke kiri */
+.rocket-statistics.hidden-left {
+  transform: translateX(calc(-100% - 40px));
+}
+
+/* Kalau panel bawah ditutup, sidebar memanjang ke bawah */
+.progress-scene.bottom-hidden .rocket-statistics {
+  bottom: 20px;
+}
+
+.rocket-statistics::-webkit-scrollbar {
+  width: 5px;
+}
+
+.rocket-statistics::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rocket-statistics::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #475569;
+}
+
+/* Telemetry Heading */
+
+.statistics-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+
+  margin-bottom: 14px;
+}
+
+.statistics-kicker {
+  color: #60a5fa;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+}
+
+.statistics-heading h3 {
+  margin: 5px 0 0;
+
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.live-indicator {
+  padding-top: 2px;
+
+  font-size: 10px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.live-indicator.active {
+  color: #4ade80;
+}
+
+.live-indicator.paused {
+  color: #fbbf24;
+}
+
+/* Telemetry Data */
+
+.statistics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 7px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+
+  min-width: 0;
+  padding: 10px;
+
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.75);
+}
+
+.stat-item span {
+  color: #94a3b8;
+  font-size: 9px;
+  letter-spacing: 0.7px;
+}
+
+.stat-item strong {
+  overflow-wrap: anywhere;
+
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.stat-item small {
+  display: none;
+}
+
+/* Mission Time */
+
+.statistics-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+
+  margin-top: 12px;
+  padding-top: 12px;
+
+  border-top: 1px solid #263244;
+}
+
+.statistics-footer span {
+  color: #94a3b8;
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+.statistics-footer strong {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* =========================================
+   MISSION SYSTEMS - BOTTOM PANEL
+========================================= */
+
+.mission-systems-panel {
+  position: absolute;
+  z-index: 5;
+
+  left: 24px;
+  right: 24px;
+  bottom: 14px;
+
+  height: 180px;
+  padding: 10px 16px;
+
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+
+  background: rgba(8, 15, 28, 0.92);
+  backdrop-filter: blur(12px);
+
+  transition: transform 0.3s ease;
+}
+
+/* Sembunyi ke bawah */
+.mission-systems-panel.hidden-bottom {
+  transform: translateY(calc(100% + 40px));
+}
+
+/* Systems Heading */
+
+.systems-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  margin-bottom: 8px;
+}
+
+.systems-heading h3 {
+  margin: 3px 0 0;
+
+  font-size: 15px;
+}
+
+.systems-status {
+  color: #fbbf24;
+  font-size: 9px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* Systems Grid */
+
+.systems-grid {
+  display: grid;
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+
+  gap: 8px;
+  height: 120px;
+}
+
+/* Individual System Card */
+
+.system-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+
+  min-width: 0;
+  min-height: 0;
+  padding: 10px 12px;
+
+  border-radius: 9px;
+  background: rgba(30, 41, 59, 0.75);
+
+  transition: background 0.2s ease;
+}
+
+.system-item:hover {
+  background: rgba(51, 65, 85, 0.85);
+}
+
+.system-item > span {
+  color: #94a3b8;
+  font-size: 9px;
+  letter-spacing: 0.6px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.system-value {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+
+  min-width: 0;
+}
+
+.system-value strong {
+  overflow-wrap: anywhere;
+
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.system-value small {
+  color: #94a3b8;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.system-item p {
+  display: none;
+}
+
+/* =========================================
+   TOGGLE BUTTONS
+========================================= */
+
+.panel-toggle {
+  position: absolute;
+  z-index: 10;
+
+  border: 1px solid #334155;
+  background: rgba(15, 23, 42, 0.92);
+  color: white;
+
+  font-size: 11px;
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+}
+
+.panel-toggle:hover {
+  background: #1e293b;
+}
+
+/* Toggle kiri: menempel di tepi kanan sidebar */
+.toggle-left {
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 24px;
+  height: 56px;
+
+  border-radius: 0 8px 8px 0;
+}
+
+.toggle-left.open {
+  left: 249px; /* 24 (left) + 225 (lebar sidebar) */
+}
+
+.toggle-left.closed {
+  left: 0;
+}
+
+/* Toggle bawah: menempel di tepi atas panel bawah */
+.toggle-bottom {
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 56px;
+  height: 24px;
+
+  border-radius: 8px 8px 0 0;
+}
+
+.toggle-bottom.open {
+  bottom: 195px; /* 20 (bottom) + 195 (tinggi panel) */
+}
+
+.toggle-bottom.closed {
+  bottom: 0;
+}
+
+/* =========================================
+   RESPONSIVE - TABLET
+========================================= */
+
+@media (max-width: 1100px) {
+  .rocket-statistics {
+    left: 16px;
+    width: 190px;
+  }
+
+  .toggle-left.open {
+    left: 206px; /* 16 + 190 */
+  }
+
+  .mission-progress-panel {
+    left: 140px;
+    right: 16px;
+  }
+
+  .mission-systems-panel {
+    left: 16px;
+    right: 16px;
+  }
+
+  .progress-back {
+    left: 16px;
+  }
+}
+
+/* =========================================
+   RESPONSIVE - MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+  .progress-back {
+    top: 16px;
+    left: 16px;
+  }
+
+  .mission-progress-panel {
+    top: 66px;
+    left: 16px;
+    right: 16px;
+
+    padding: 15px;
+  }
+
+  /* Telemetry */
+
+  .rocket-statistics {
+    top: auto;
+
+    left: 16px;
+    right: 16px;
+    bottom: calc(36vh + 28px);
+
+    width: auto;
+    max-height: 150px;
+    padding: 12px;
+  }
+
+  .progress-scene.bottom-hidden .rocket-statistics {
+    bottom: 16px;
+  }
+
+  .statistics-heading {
+    margin-bottom: 8px;
+  }
+
+  .statistics-heading h3 {
+    font-size: 14px;
+  }
+
+  .statistics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-item {
+    padding: 8px;
+  }
+
+  .stat-item span {
+    font-size: 8px;
+  }
+
+  .stat-item strong {
+    font-size: 11px;
+  }
+
+  .statistics-footer {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Mission Systems */
+
+  .mission-systems-panel {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+
+    height: 36vh;
+    padding: 12px;
+
+    overflow-y: auto;
+  }
+
+  .systems-heading {
+    margin-bottom: 10px;
+  }
+
+  .systems-heading h3 {
+    font-size: 14px;
+  }
+
+  .systems-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+
+    height: auto;
+    gap: 7px;
+  }
+
+  .system-item {
+    min-height: 65px;
+    padding: 9px;
+  }
+
+  .system-value strong {
+    font-size: 16px;
+  }
+
+  /* Toggle di mobile */
+
+  .toggle-left {
+    top: auto;
+    bottom: calc(36vh + 28px + 60px);
+    transform: none;
+    width: 22px;
+    height: 44px;
+  }
+
+  .toggle-left.open {
+    left: calc(100% - 38px); /* di dalam tepi kanan sidebar */
+    border-radius: 8px;
+  }
+
+  .toggle-left.closed {
+    left: 0;
+  }
+
+  .progress-scene.bottom-hidden .toggle-left {
+    bottom: 76px;
+  }
+
+  .toggle-bottom.open {
+    bottom: calc(36vh + 16px);
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 380px) {
+  .mission-progress-panel {
+    padding: 12px;
+  }
+
+  .progress-heading {
+    font-size: 11px;
+  }
+
+  .progress-heading strong {
+    font-size: 17px;
+  }
+
+  .rocket-statistics {
+    left: 12px;
+    right: 12px;
+  }
+
+  .mission-systems-panel {
+    left: 12px;
+    right: 12px;
+  }
+
+  .system-item > span {
+    font-size: 8px;
+  }
+
+  .system-value strong {
+    font-size: 14px;
+  }
+}
