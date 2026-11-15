@@ -1,14 +1,55 @@
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { TextureLoader } from "three";
 import { useEffect, useMemo, useRef } from "react";
 import { CELESTIAL_RADII, SCENE_COLORS } from "../../constants";
+import artemisTexture from "../../assets/artemis.png";
 import { TEXTURE } from "../../assets/assetRegistry";
 
 // Konversi koordinat EME2000 ke basis Three.js
 function toThreePosition([x, y, z]) {
   return [x, z, -y];
+}
+
+// Wahana Orion
+function Orion({ points, currentIndex }) {
+  const texture = useTexture(artemisTexture);
+
+  useEffect(() => {
+    if (texture) {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.needsUpdate = true;
+    }
+  }, [texture]);
+
+  if (!points || points.length === 0) return null;
+  const index = Math.min(currentIndex, points.length - 1);
+  const position = toThreePosition(points[index]);
+
+  const aspect =
+    texture.image && texture.image.height
+      ? texture.image.width / texture.image.height
+      : 1;
+  const spriteHeight = 0.028;
+
+  return (
+    <group position={position}>
+      <sprite scale={[spriteHeight * aspect, spriteHeight, 1]}>
+        <spriteMaterial
+          map={texture}
+          transparent
+          toneMapped={false}
+          depthWrite={false}
+        />
+      </sprite>
+      <pointLight
+        color={SCENE_COLORS.ROCKET_TRAJECTORY}
+        intensity={1}
+        distance={0.2}
+      />
+    </group>
+  );
 }
 
 function getTargetVector(cameraTarget, currentIndex, rocketPoints, moonPoints) {
@@ -119,7 +160,7 @@ function CameraRig({ cameraTarget, currentIndex, rocketPoints, moonPoints }) {
 }
 
 // Lintasan Orion
-function Trajectory({ points }) {
+function Trajectory({ points, label, onHover }) {
   const geometry = useMemo(() => {
     return new THREE.BufferGeometry().setFromPoints(
       points.map((point) => {
@@ -133,8 +174,23 @@ function Trajectory({ points }) {
     return () => geometry.dispose();
   }, [geometry]);
 
+  const handlePointerMove = (event) => {
+    event.stopPropagation();
+    onHover?.({
+      label,
+      color: SCENE_COLORS.ROCKET_TRAJECTORY,
+      x: event.clientX,
+      y: event.clientY,
+    });
+  };
+
   return (
-    <line geometry={geometry}>
+    <line
+      geometry={geometry}
+      onPointerOver={handlePointerMove}
+      onPointerMove={handlePointerMove}
+      onPointerOut={() => onHover?.(null)}
+    >
       <lineBasicMaterial
         color={SCENE_COLORS.ROCKET_TRAJECTORY}
         transparent
@@ -159,38 +215,6 @@ function Earth() {
         roughness={1}
       />
     </mesh>
-  );
-}
-
-// Wahana Orion
-function Orion({ points, currentIndex }) {
-  if (!points || points.length === 0) return null;
-
-  const index = Math.min(
-    currentIndex,
-    points.length - 1
-  );
-
-  const position = toThreePosition(points[index]);
-
-  return (
-    <group position={position}>
-      <mesh>
-        <boxGeometry args={[0.008, 0.008, 0.02]} />
-
-        <meshStandardMaterial
-          color={SCENE_COLORS.ROCKET_TRAJECTORY}
-          emissive="#7a3510"
-          emissiveIntensity={0.5}
-        />
-      </mesh>
-
-      <pointLight
-        color={SCENE_COLORS.ROCKET_TRAJECTORY}
-        intensity={1}
-        distance={0.2}
-      />
-    </group>
   );
 }
 
@@ -228,6 +252,7 @@ function SceneContent({
   rocketPoints,
   moonPoints,
   cameraTarget,
+  onTrajectoryHover,
 }) {
   return (
     <>
@@ -242,7 +267,11 @@ function SceneContent({
 
       {rocketPoints.length > 0 && (
         <>
-          <Trajectory points={rocketPoints} />
+          <Trajectory
+            points={rocketPoints}
+            label="Spacecraft trajectory"
+            onHover={onTrajectoryHover}
+          />
 
           <Orion
             points={rocketPoints}
@@ -268,10 +297,12 @@ export default function ArtemisScene({
   rocketPoints = [],
   moonPoints = [],
   cameraTarget = "earth",
+  onTrajectoryHover,
 }) {
   return (
     <div className="mission-canvas">
       <Canvas
+        raycaster={{ params: { Line: { threshold: 0.012 } } }}
         camera={{
           position: [0.8, 0, 5],
           fov: 45,
@@ -284,6 +315,7 @@ export default function ArtemisScene({
           rocketPoints={rocketPoints}
           moonPoints={moonPoints}
           cameraTarget={cameraTarget}
+          onTrajectoryHover={onTrajectoryHover}
         />
       </Canvas>
     </div>

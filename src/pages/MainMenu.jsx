@@ -149,7 +149,12 @@ export default function MainMenu({ onLaunch }) {
     if (!activePanel?.startsWith("launch_")) return;
 
     const missionId = activePanel.replace("launch_", "");
-    const availableMissions = ["artemis_1", "lunar_2014"];
+    const availableMissions = [
+      "artemis_1",
+      "artemis_2",
+      "artemis_3",
+      "lunar_2014",
+    ];
 
     if (!availableMissions.includes(missionId)) {
       console.warn("Mission belum tersedia:", missionId);
@@ -199,7 +204,6 @@ export default function MainMenu({ onLaunch }) {
             <div className="brand-icon-box" aria-hidden="true">
               <img src={LOGO.logo} alt="" />
             </div>
-
             <div className="brand-text">
               <span className="brand-title">DELTA-V</span>
               <span className="brand-subtitle">SPACE MISSION SANDBOX</span>
@@ -249,7 +253,10 @@ export default function MainMenu({ onLaunch }) {
 
       {/* Modal */}
       {panel && (
-        <Modal onClose={() => setActivePanel(null)}>
+        <Modal
+          onClose={() => setActivePanel(null)}
+          ariaLabel={panel.title}
+        >
           <span className="modal-kicker">
             {activePanel === "tutorial"
               ? `${panel.kicker} // STEP ${currentTutorial.step} OF 0${TUTORIAL_STEPS.length}`
@@ -419,6 +426,20 @@ export default function MainMenu({ onLaunch }) {
                 <b>→</b>
               </button>
             ))}
+
+          {activePanel === "sandbox" && (
+            <button
+              type="button"
+              className="modal-option"
+              onClick={() => onLaunch("sandbox")}
+            >
+              <span>
+                <strong>BUILD ROCKET</strong>
+                <small>Assemble your rocket before launching Lunar 2014.</small>
+              </span>
+              <b>→</b>
+            </button>
+          )}
 
           {/* Tombol Launch */}
           {activePanel?.startsWith("launch_") && (
