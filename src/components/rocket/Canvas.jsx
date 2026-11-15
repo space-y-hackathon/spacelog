@@ -6,6 +6,8 @@ export default function Canvas({
   parts,
   onDropPart,
   onRemovePart,
+  selectedCategory,
+  onSelectZone,
 }) {
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -39,19 +41,24 @@ export default function Canvas({
           );
 
           return (
-            <div
+            <button
               key={zone.id}
-              className={`blueprint-zone ${occupied ? "occupied" : ""}`}
+              type="button"
+              disabled={selectedCategory !== zone.category}
+              onClick={() => onSelectZone(zone)}
+              className={`blueprint-zone ${occupied ? "occupied" : ""} ${selectedCategory === zone.category ? "available" : ""}`}
+              data-zone-id={zone.id}
               style={{
                 left: `${zone.x}%`,
                 top: `${zone.y}%`,
                 width: `${zone.width}%`,
                 height: `${zone.height}%`,
               }}
-              title={zone.label}
+              aria-label={`${zone.label}${zone.required ? ", required" : ""}`}
+              title={`${zone.label}${zone.required ? " (required)" : ""}`}
             >
-              <span>{zone.label}</span>
-            </div>
+              <span aria-hidden="true">{zone.placeholderLabel}</span>
+            </button>
           );
         })}
       </div>

@@ -226,11 +226,16 @@
   );
   box-shadow: 0 0 20px rgba(103, 212, 246, 0.12);
 }
-.launch-button:hover {
+.launch-button:hover:not(:disabled) {
   border-color: var(--cyan);
   background: rgba(103, 212, 246, 0.3);
   box-shadow: 0 0 24px var(--cyan-glow);
   transform: translateY(-3px);
+}
+.launch-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 .reset-button {
   border-color: rgba(248, 113, 113, 0.3);
@@ -513,6 +518,7 @@
   justify-self: center;
   overflow: visible;
   pointer-events: auto;
+  container-type: inline-size;
   background-image:
     linear-gradient(rgba(103, 212, 246, 0.045) 1px, transparent 1px),
     linear-gradient(90deg, rgba(103, 212, 246, 0.045) 1px, transparent 1px);
@@ -530,23 +536,45 @@
   align-items: center;
   justify-content: center;
   padding: 3px;
-  border: 1px dashed rgba(103, 212, 246, 0.4);
-  border-radius: 5px;
-  background: rgba(103, 212, 246, 0.035);
+  border: 1px dashed rgba(169, 205, 230, 0.32);
+  border-radius: 6px;
+  background: rgba(177, 210, 232, 0.035);
+  pointer-events: none;
   transition:
     background 150ms ease,
     border-color 150ms ease;
 }
+.blueprint-zone.available {
+  pointer-events: auto;
+  cursor: pointer;
+  border-color: var(--cyan);
+  background: rgba(103, 212, 246, 0.2);
+}
+.blueprint-zone.available:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
 .blueprint-zone span {
-  color: rgba(190, 220, 240, 0.6);
-  font-size: 9px;
-  font-weight: 600;
+  color: #f1f5f9;
+  font-family: "Times New Roman", serif;
+  font-size: clamp(11px, 1.8cqw, 13px);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
   text-align: center;
-  text-transform: uppercase;
+  text-transform: lowercase;
+  white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
   pointer-events: none;
 }
+.blueprint-zone[data-zone-id="separator-core"] span {
+  transform: translateY(-2px);
+}
+.blueprint-zone[data-zone-id="engine-center"] span {
+  transform: translateY(1.2em);
+}
 .blueprint-zone.occupied {
-  border-color: rgba(74, 222, 128, 0.7);
+  border-color: rgba(135, 225, 180, 0.62);
   background: rgba(74, 222, 128, 0.08);
 }
 .rocket-installed-panel {
@@ -554,17 +582,58 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 350px;
+  height: 100%;
   min-width: 0;
   min-height: 0;
   padding: 16px;
-  overflow: hidden;
+  overflow-y: auto;
   background: rgba(8, 15, 28, 0.94);
   border: 1px solid rgba(148, 163, 184, 0.22);
   border-radius: 14px;
   backdrop-filter: blur(12px);
   box-shadow: 0 16px 45px rgba(0, 0, 0, 0.25);
   pointer-events: auto;
+}
+.requirements-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.requirements-heading h3 {
+  margin: 0;
+  color: #e5edf7;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 21px;
+}
+.requirements-heading span {
+  color: var(--cyan);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.requirements-list {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 16px;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+}
+.requirements-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #dbe8f5;
+}
+.requirements-list li span:last-child {
+  white-space: nowrap;
+}
+.requirements-list .missing span:last-child {
+  color: #fbbf80;
+}
+.requirements-list .ready span:last-child {
+  color: #86efac;
 }
 .installed-heading {
   display: flex;
@@ -603,7 +672,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-height: 0;
+  flex-shrink: 0;
   padding-top: 12px;
   overflow-y: auto;
 }
@@ -680,7 +749,8 @@
   opacity: 0;
   transition: opacity 150ms ease;
 }
-.rocket-layer:hover .rocket-layer-remove {
+.rocket-layer:hover .rocket-layer-remove,
+.rocket-layer-remove:focus-visible {
   opacity: 1;
 }
 .launch-inventory {
@@ -710,6 +780,35 @@
   flex-shrink: 0;
   padding-bottom: 10px;
   border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+.inventory-heading-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.inventory-search {
+  width: min(250px, 40%);
+  min-width: 0;
+  padding: 8px 10px;
+  color: #e5edf7;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+}
+.inventory-search::placeholder {
+  color: #aab8c9;
+}
+.inventory-search:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+.inventory-no-results {
+  margin: auto 0;
+  color: #aab8c9;
+  font-size: 13px;
 }
 .inventory-heading h3 {
   margin: 0;
@@ -809,25 +908,70 @@
   }
 }
 @media (max-width: 850px) {
-  .rocket-builder-main {
-    left: 16px;
-    right: 16px;
-    top: 300px;
-    bottom: 250px;
-    grid-template-columns: minmax(0, 1fr) 190px;
+  .launch-scene {
+    overflow-y: auto;
+  }
+  .launch-environment {
+    position: fixed;
+  }
+  .launch-header {
+    position: relative;
+    inset: auto;
+    margin: 16px;
   }
   .launch-brief {
-    top: 90px;
-    left: 16px;
-    width: 260px;
+    position: relative;
+    inset: auto;
+    width: auto;
     max-height: 190px;
+    margin: 16px;
+  }
+  .rocket-builder {
+    position: relative;
+    inset: auto;
+    margin: 16px;
+  }
+  .rocket-builder-main {
+    position: relative;
+    inset: auto;
+    height: 500px;
+    grid-template-columns: minmax(0, 1fr) 190px;
   }
   .launch-inventory {
+    position: relative;
+    inset: auto;
     height: 190px;
+    margin-top: 16px;
   }
   .launch-actions {
-    right: 16px;
-    bottom: 205px;
+    position: relative;
+    inset: auto;
+    flex-direction: row;
+    margin: 16px;
+  }
+}
+@media (max-width: 500px) {
+  .inventory-heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .inventory-heading-title {
+    justify-content: space-between;
+  }
+  .inventory-search {
+    width: 100%;
+  }
+  .rocket-builder-main {
+    grid-template-columns: minmax(0, 1fr) minmax(140px, 42%);
+    gap: 8px;
+  }
+  .rocket-installed-panel {
+    padding: 10px;
+  }
+  .requirements-heading {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 .installed-list {

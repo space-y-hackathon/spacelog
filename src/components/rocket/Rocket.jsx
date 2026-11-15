@@ -4,20 +4,24 @@ import { useMemo, useState } from "react";
 import { ROCKET_PARTS } from "../../assets/assetRegistry";
 import Canvas from "./Canvas";
 import Inventory from "./Inventory";
-import { BLUEPRINT_ZONES } from "./Blueprint";
+import { BLUEPRINT_ZONES, REQUIRED_ZONES } from "./Blueprint";
 
 function getPartCategory(path) {
   const value = path.toLowerCase();
 
   if (value.includes("launch escape system")) return "escape-system";
-  if (value.includes("aerodynamic cone")) return "aerodynamic-cone";
+  if (value.includes("aerodynamic cone")) return "cone-small";
+  if (value.includes("cone small")) return "cone-small";
   if (value.includes("crew capsule")) return "capsule";
-  if (value.includes("orion service module")) return "service-module";
-  if (value.includes("solar panel")) return "solar-panel";
-  if (value.includes("rcs")) return "rcs";
+  if (value.includes("service module")) return "service-module";
+  if (value.includes("rcs left")) return "left-rcs";
+  if (value.includes("rcs right")) return "right-rcs";
   if (value.includes("booster")) return "booster";
+  if (value.includes("core engine")) return "core-engine";
   if (value.includes("engine")) return "engine";
+  if (value.includes("big cone separator")) return "big-cone-separator";
   if (value.includes("separator")) return "separator";
+  if (value.includes("core stage 3")) return "core-stage-3";
 
   if (
     value.includes("fuel tank") ||
@@ -30,16 +34,15 @@ function getPartCategory(path) {
   return "unknown";
 }
 
-export default function Rocket() {
-  const [installedParts, setInstalledParts] = useState([]);
-
+export default function Rocket({ installedParts, setInstalledParts, missingZones }) {
+  const [selectedKey, setSelectedKey] = useState(null);
   const inventory = useMemo(() => {
     return Object.fromEntries(
       Object.entries(ROCKET_PARTS).map(([key, item]) => [
         key,
         {
           ...item,
-          category: getPartCategory(`${key} ${item.name}`),
+          category: getPartCategory(item.name),
         },
       ])
     );
@@ -81,8 +84,11 @@ export default function Rocket() {
       return;
     }
 
-    const zone = nearest.zone;
+    installPart(key, nearest.zone);
+  };
 
+  const installPart = (key, zone) => {
+    const item = inventory[key];
     setInstalledParts((prev) => [
       ...prev.filter((part) => part.zoneId !== zone.id),
       {
@@ -99,6 +105,7 @@ export default function Rocket() {
         zIndex: prev.length + 1,
       },
     ]);
+    setSelectedKey(null);
   };
 
   const handleRemovePart = (id) => {
@@ -134,9 +141,27 @@ export default function Rocket() {
           parts={installedParts}
           onDropPart={handleDropPart}
           onRemovePart={handleRemovePart}
+          selectedCategory={inventory[selectedKey]?.category}
+          onSelectZone={(zone) => installPart(selectedKey, zone)}
         />
 
         <aside className="rocket-installed-panel">
+          <div className="requirements-heading">
+            <h3>REQUIRED PARTS</h3>
+            <span>{REQUIRED_ZONES.length - missingZones.length}/{REQUIRED_ZONES.length} READY</span>
+          </div>
+          <ul className="requirements-list" aria-label="Required rocket parts">
+            {REQUIRED_ZONES.map((zone) => {
+              const missing = missingZones.some((item) => item.id === zone.id);
+              return (
+                <li key={zone.id} className={missing ? "missing" : "ready"}>
+                  <span>{zone.label}</span>
+                  <span>{missing ? "Missing" : "Installed"}</span>
+                </li>
+              );
+            })}
+          </ul>
+
           <div className="installed-heading">
             <h3>ASSEMBLED PARTS</h3>
             <span>{installedParts.length} INSTALLED</span>
@@ -146,7 +171,7 @@ export default function Rocket() {
             <p className="installed-empty">
               No components installed yet.
               <br />
-              Drag components from inventory to the blueprint.
+              Drag a component to the blueprint, or select it and then select a matching zone.
             </p>
           ) : (
             <div className="installed-list">
@@ -170,6 +195,8 @@ export default function Rocket() {
       <Inventory
         inventory={inventory}
         onDragStart={handleDragStart}
+        selectedKey={selectedKey}
+        onSelectPart={setSelectedKey}
       />
     </div>
   );
