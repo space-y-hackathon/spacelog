@@ -1,0 +1,118 @@
+.breaking-news-scene {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(20px, 4vw, 56px);
+  background: #080d16;
+  color: #ffffff;
+  font-family: inherit;
+}
+
+.breaking-news-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: #67d4f6;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.breaking-news-back.menu-btn {
+  min-height: 42px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.breaking-news-story {
+  width: min(100%, 920px);
+  margin: clamp(64px, 13vh, 132px) auto 0;
+  padding: 28px 0 0;
+  border-top: 3px solid #67d4f6;
+}
+
+.breaking-news-kicker {
+  color: #67d4f6;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.breaking-news-story h1 {
+  max-width: 820px;
+  margin: 14px 0 16px;
+  font-family: "Barlow Condensed", Impact, sans-serif;
+  font-size: clamp(30px, 5vw, 48px);
+  line-height: 1.05;
+}
+
+.breaking-news-lede {
+  max-width: 680px;
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.breaking-news-data {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 36px;
+  border-top: 1px solid #334155;
+  border-bottom: 1px solid #334155;
+}
+
+.breaking-news-data > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 20px;
+}
+
+.breaking-news-data > div + div {
+  border-left: 1px solid #334155;
+}
+
+.breaking-news-data span,
+.breaking-news-data small {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.breaking-news-data strong {
+  overflow-wrap: anywhere;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 640px) {
+  .breaking-news-header {
+    align-items: flex-start;
+  }
+
+  .breaking-news-story {
+    margin-top: 64px;
+  }
+
+  .breaking-news-story h1 {
+    font-size: 34px;
+  }
+
+  .breaking-news-data {
+    grid-template-columns: 1fr;
+  }
+
+  .breaking-news-data > div {
+    padding: 16px 0;
+  }
+
+  .breaking-news-data > div + div {
+    border-top: 1px solid #334155;
+    border-left: 0;
+  }
+}

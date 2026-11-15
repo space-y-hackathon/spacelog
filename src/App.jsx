@@ -3,19 +3,28 @@ import { useState } from "react";
 import MainMenu from "./pages/MainMenu";
 import LaunchScene from "./game/scene/LaunchScene";
 import ProgresScene from "./game/scene/ProgresScene";
+import BreakingNewsScene from "./game/scene/BreakingNewsScene";
 
 export default function App() {
   const [selectedMission, setSelectedMission] = useState(null);
+  const [missionSummary, setMissionSummary] = useState(null);
   const [currentStage, setCurrentStage] = useState("launch");
 
   const handleLaunch = (missionId) => {
     setSelectedMission(missionId);
+    setMissionSummary(null);
     setCurrentStage("launch");
   };
 
   const handleBack = () => {
     setSelectedMission(null);
+    setMissionSummary(null);
     setCurrentStage("launch");
+  };
+
+  const handleMissionComplete = (summary) => {
+    setMissionSummary(summary);
+    setCurrentStage("breaking-news");
   };
 
   // Main Menu
@@ -39,6 +48,16 @@ export default function App() {
     return (
       <ProgresScene
         missionId={selectedMission}
+        onBack={handleBack}
+        onContinue={handleMissionComplete}
+      />
+    );
+  }
+
+  if (currentStage === "breaking-news") {
+    return (
+      <BreakingNewsScene
+        summary={missionSummary}
         onBack={handleBack}
       />
     );

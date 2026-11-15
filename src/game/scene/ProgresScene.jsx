@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import MissionScene from "./MissionScene";
+import Button from "../../components/Button";
+import Modal from "../../components/Modal";
 import "./ProgresScene.css";
 import { artemis1Trajectory } from "../../data/scenarios/artemis-1/adapter.js";
 import { PLAYBACK_INTERVAL } from '../../constants';
@@ -167,6 +169,7 @@ function calculateDistanceToMoon(currentPoint, rocketPoints, moonPoints, index) 
 export default function ProgresScene({
   missionId = "lunar-2014",
   onBack,
+  onContinue,
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -176,6 +179,7 @@ export default function ProgresScene({
   const [cameraTarget, setCameraTarget] = useState("earth");
   const [showLeft, setShowLeft] = useState(true);
   const [showBottom, setShowBottom] = useState(true);
+  const [hoveredTrajectory, setHoveredTrajectory] = useState(null);
 
   const trackRef = useRef(null);
 
@@ -265,6 +269,7 @@ export default function ProgresScene({
     TOTAL_POINTS > 1
       ? (safeIndex / (TOTAL_POINTS - 1)) * 100
       : 0;
+  const isMissionComplete = progress >= 100;
 
   // Reset playback & kamera ketika berganti misi
   useEffect(() => {
@@ -309,12 +314,13 @@ export default function ProgresScene({
   // Hentikan playback ketika mencapai ujung awal/akhir sesuai arah
   useEffect(() => {
     if (TOTAL_POINTS === 0) return;
-    if (direction === 1 && safeIndex >= TOTAL_POINTS - 1) {
-      setIsPlaying(false);
-    } else if (direction === -1 && safeIndex <= 0) {
+    if (
+      isMissionComplete ||
+      (direction === -1 && safeIndex <= 0)
+    ) {
       setIsPlaying(false);
     }
-  }, [safeIndex, TOTAL_POINTS, direction]);
+  }, [safeIndex, TOTAL_POINTS, direction, isMissionComplete]);
 
   // Shortcut keyboard (Spasi = Play/Pause, Panah Kiri/Kanan = Step, C = Ganti Kamera)
   useEffect(() => {
@@ -507,8 +513,48 @@ export default function ProgresScene({
           moonPoints={moonPoints}
           rocketPoints={rocketPoints}
           cameraTarget={activeCameraTarget}
+          onTrajectoryHover={setHoveredTrajectory}
         />
       </section>
+      {hoveredTrajectory && (
+        <div className="trajectory-legend" role="status">
+          <span
+            className="trajectory-legend-swatch"
+            style={{ backgroundColor: hoveredTrajectory.color }}
+          />
+          {hoveredTrajectory.label}
+        </div>
+      )}
+      {isMissionComplete && (
+        <Modal dismissible={false} ariaLabel="Mission success">
+          <div className="mission-success">
+            <span className="modal-kicker">MISSION COMPLETE</span>
+            <h2>Mission successful</h2>
+            <p>
+              {missionData.name} reached the final recorded waypoint.
+            </p>
+            <Button
+              variant="primary"
+              className="mission-success-action"
+              onClick={() =>
+                onContinue({
+                  missionName: missionData.name,
+                  sampleCount: TOTAL_POINTS,
+                  completionDate: currentPoint.Date,
+                  completionTime: currentPoint.Time,
+                  finalPosition: {
+                    x: formatNumber(currentPoint.X),
+                    y: formatNumber(currentPoint.Y),
+                    z: formatNumber(currentPoint.Z),
+                  },
+                })
+              }
+            >
+              Continue
+            </Button>
+          </div>
+        </Modal>
+      )}
 
       {/* Back Button */}
       <button
