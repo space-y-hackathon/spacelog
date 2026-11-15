@@ -22,7 +22,11 @@ function toScenePosition(pos) {
 
 // Hitung koordinat geocentric J2000 (km) Bulan dari timestamp misi
 function getMoonGeocentricKm(timestamp) {
-  const ms = new Date(timestamp).getTime();
+  const timestampText = String(timestamp);
+  const normalizedTimestamp = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(timestampText)
+    ? timestampText
+    : `${timestampText}Z`;
+  const ms = new Date(normalizedTimestamp).getTime();
   const safeMs = Number.isFinite(ms) ? ms : Date.UTC(2022, 10, 16);
   const jd = safeMs / 86400000 + 2440587.5;
   const T = (jd - 2451545.0) / 36525;

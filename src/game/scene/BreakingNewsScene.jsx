@@ -1,46 +1,67 @@
+import { useState } from "react";
 import Button from "../../components/Button";
 import "./BreakingNewsScene.css";
 
 export default function BreakingNewsScene({ summary, onBack }) {
+  const [tickerPaused, setTickerPaused] = useState(false);
+  const tickerText = [
+    `[MISSION SUMMARY] ${summary.missionName} COMPLETED`,
+    `DATES: ${summary.startDate} — ${summary.endDate}`,
+    `TOTAL DURATION: ${summary.duration}`,
+    `MAX VELOCITY: ${summary.maxVelocity} km/s`,
+    `CLOSEST TO MOON: ${summary.closestLunarApproach} km`,
+    `MAX DISTANCE FROM EARTH: ${summary.maxEarthDistance} km`,
+    `TELEMETRY: ${summary.sampleCount.toLocaleString("en-US")} SAMPLES`,
+    `HEADLINE: ${summary.headline}`,
+  ].join("  •  ");
+
   return (
     <main className="breaking-news-scene">
-      <header className="breaking-news-header">
-        <span>SPACELOG / MISSION DESK</span>
-        <Button
-          className="breaking-news-back"
-          onClick={onBack}
+      <Button
+        className="breaking-news-back"
+        onClick={onBack}
+      >
+        Return to menu
+      </Button>
+
+      <section className="breaking-news-main" aria-label="Mission report">
+        <article className="breaking-news-story">
+          <span className="breaking-news-kicker">BREAKING NEWS</span>
+          <div className="breaking-news-headline">
+            <h1>Mission complete: {summary.displayMissionName}</h1>
+            <p className="breaking-news-lede">
+              Flight window: {summary.startDate} — {summary.endDate} ·{" "}
+              {summary.duration} ·{" "}
+              {summary.sampleCount.toLocaleString("en-US")} telemetry samples
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section className="breaking-news-ticker" aria-label="Mission summary">
+        <p className="breaking-news-sr-only">{tickerText}</p>
+        <div className="breaking-news-ticker-viewport" aria-hidden="true">
+          <div
+            className={`breaking-news-ticker-track ${
+              tickerPaused ? "is-paused" : ""
+            }`}
+          >
+            <span className="breaking-news-ticker-copy">{tickerText}</span>
+            <span className="breaking-news-ticker-copy">
+              {tickerText}
+            </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          className="breaking-news-ticker-toggle"
+          aria-label={`${tickerPaused ? "Resume" : "Pause"} mission summary ticker`}
+          aria-pressed={tickerPaused}
+          onClick={() => setTickerPaused((paused) => !paused)}
         >
-          Return to menu
-        </Button>
-      </header>
-
-      <article className="breaking-news-story">
-        <span className="breaking-news-kicker">BREAKING NEWS / FLIGHT REPORT</span>
-        <h1>Mission complete: {summary.missionName}</h1>
-        <p className="breaking-news-lede">
-          The {summary.missionName} simulation reached its final recorded
-          waypoint. This report summarizes the completed trajectory dataset.
-        </p>
-
-        <section className="breaking-news-data" aria-label="Mission summary">
-          <div>
-            <span>TRACK SAMPLES</span>
-            <strong>{summary.sampleCount.toLocaleString("en-US")}</strong>
-          </div>
-          <div>
-            <span>FINAL RECORD</span>
-            <strong>{summary.completionDate}</strong>
-            <small>{summary.completionTime}</small>
-          </div>
-          <div>
-            <span>FINAL POSITION (KM)</span>
-            <strong>X {summary.finalPosition.x}</strong>
-            <small>
-              Y {summary.finalPosition.y} / Z {summary.finalPosition.z}
-            </small>
-          </div>
-        </section>
-      </article>
+          {tickerPaused ? "Resume" : "Pause"}
+        </button>
+      </section>
     </main>
   );
 }
