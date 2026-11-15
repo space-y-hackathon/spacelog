@@ -114,6 +114,7 @@ function CameraRig({ cameraTarget, currentIndex, rocketPoints, moonPoints }) {
 }
 
 // Membuat garis lintasan
+// Membuat garis lintasan
 function Trajectory({ points, color, label, onHover }) {
   const geometry = useMemo(() => {
     return new THREE.BufferGeometry().setFromPoints(
@@ -125,14 +126,22 @@ function Trajectory({ points, color, label, onHover }) {
     return () => geometry.dispose();
   }, [geometry]);
 
+  const handlePointerMove = (event) => {
+    event.stopPropagation();
+    onHover?.({
+      label,
+      color,
+      x: event.clientX,
+      y: event.clientY,
+    });
+  };
+
   return (
     <line
       geometry={geometry}
-      onPointerOver={(event) => {
-        event.stopPropagation();
-        onHover({ label, color });
-      }}
-      onPointerOut={() => onHover(null)}
+      onPointerOver={handlePointerMove}
+      onPointerMove={handlePointerMove}
+      onPointerOut={() => onHover?.(null)}
     >
       <lineBasicMaterial color={color} transparent opacity={0.8} />
     </line>
