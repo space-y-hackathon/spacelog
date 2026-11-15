@@ -133,14 +133,22 @@ function Trajectory({ points, label, onHover }) {
     return () => geometry.dispose();
   }, [geometry]);
 
+  const handlePointerMove = (event) => {
+    event.stopPropagation();
+    onHover?.({
+      label,
+      color: SCENE_COLORS.ROCKET_TRAJECTORY,
+      x: event.clientX,
+      y: event.clientY,
+    });
+  };
+
   return (
     <line
       geometry={geometry}
-      onPointerOver={(event) => {
-        event.stopPropagation();
-        onHover({ label, color: SCENE_COLORS.ROCKET_TRAJECTORY });
-      }}
-      onPointerOut={() => onHover(null)}
+      onPointerOver={handlePointerMove}
+      onPointerMove={handlePointerMove}
+      onPointerOut={() => onHover?.(null)}
     >
       <lineBasicMaterial
         color={SCENE_COLORS.ROCKET_TRAJECTORY}
