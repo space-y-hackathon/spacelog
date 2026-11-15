@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
-
-import {
-  PANEL_CONTENT,
-  SHOWCASE_VEHICLES,
-} from "../constants";
+import { LOGO } from "../assets/assetRegistry";
+import {PANEL_CONTENT, SHOWCASE_VEHICLES} from "../constants";
 
 import Button from "../components/Button";
 import Modal from "../components/Modal";
 import RocketShowcase from "../components/RocketShowcase";
 import Starfield from "../components/Starfield";
-import Logo from "../assets/logo_putih.png";
 
 import "./MainMenu.css";
 
@@ -103,7 +99,7 @@ export default function MainMenu({ onLaunch }) {
         <section className="menu-left" aria-label="Main Menu">
           <div className="brand-card">
             <div className="brand-icon-box" aria-hidden="true">
-              <img src={ Logo } alt="" />
+              <img src={ LOGO.logo } alt="" />
             </div>
             <div className="brand-text">
               <span className="brand-title">DELTA-V</span>

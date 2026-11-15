@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { TextureLoader } from "three";
 import { useEffect, useMemo, useRef } from "react";
 import { CELESTIAL_RADII, SCENE_COLORS } from "../../constants";
-import earthTexture from "../../assets/earth-map.jpg";
+import { TEXTURE } from "../../assets/assetRegistry";
 
 // Konversi koordinat EME2000 ke basis Three.js
 function toThreePosition([x, y, z]) {
@@ -153,7 +153,7 @@ function Trajectory({ points, label, onHover }) {
 
 // Bumi
 function Earth() {
-  const texture = useLoader(TextureLoader, earthTexture);
+  const texture = useLoader(TextureLoader, TEXTURE.earth);
 
   texture.colorSpace = THREE.SRGBColorSpace;
 
