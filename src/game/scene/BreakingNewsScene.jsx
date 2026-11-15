@@ -4,15 +4,24 @@ import "./BreakingNewsScene.css";
 
 export default function BreakingNewsScene({ summary, onBack }) {
   const [tickerPaused, setTickerPaused] = useState(false);
+
+  if (!summary) return null;
+
+  const hasLunarApproach =
+    summary.closestLunarApproach && summary.closestLunarApproach !== "N/A";
+
+  const orbitalMetric = hasLunarApproach
+    ? `CLOSEST TO MOON: ${summary.closestLunarApproach} km`
+    : "ORBITAL PROFILE: LEO RENDEZVOUS & DUAL DOCKING";
+
   const tickerText = [
     `[MISSION SUMMARY] ${summary.missionName} COMPLETED`,
     `DATES: ${summary.startDate} — ${summary.endDate}`,
     `TOTAL DURATION: ${summary.duration}`,
     `MAX VELOCITY: ${summary.maxVelocity} km/s`,
-    `CLOSEST TO MOON: ${summary.closestLunarApproach} km`,
+    orbitalMetric,
     `MAX DISTANCE FROM EARTH: ${summary.maxEarthDistance} km`,
     `TELEMETRY: ${summary.sampleCount.toLocaleString("en-US")} SAMPLES`,
-    `HEADLINE: ${summary.headline}`,
   ].join("  •  ");
 
   return (

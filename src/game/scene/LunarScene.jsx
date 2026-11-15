@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { TextureLoader } from "three";
-import { CELESTIAL_RADII, SCENE_COLORS } from '../../constants';
+import { CELESTIAL_RADII, SCENE_COLORS } from "../../constants";
+import artemisTexture from "../../assets/artemis.png";
 import { TEXTURE } from "../../assets/assetRegistry";
 
 function getTargetVector(cameraTarget, currentIndex, rocketPoints, moonPoints) {
@@ -20,6 +21,41 @@ function getTargetVector(cameraTarget, currentIndex, rocketPoints, moonPoints) {
   }
 
   return new THREE.Vector3(0, 0, 0);
+}
+
+// Roket
+function Rocket({ points, currentIndex }) {
+  const texture = useTexture(artemisTexture);
+
+  useEffect(() => {
+    if (texture) {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.needsUpdate = true;
+    }
+  }, [texture]);
+
+  if (!points || points.length === 0) return null;
+  const index = Math.min(currentIndex, points.length - 1);
+  const [x, y, z] = points[index];
+
+  const aspect =
+    texture.image && texture.image.height
+      ? texture.image.width / texture.image.height
+      : 1;
+  const spriteHeight = 0.014;
+
+  return (
+    <group position={[x, z, -y]}>
+      <sprite scale={[spriteHeight * aspect, spriteHeight, 1]}>
+        <spriteMaterial
+          map={texture}
+          transparent
+          toneMapped={false}
+          depthWrite={false}
+        />
+      </sprite>
+    </group>
+  );
 }
 
 function getDefaultCameraOffset(cameraTarget) {
@@ -114,6 +150,7 @@ function CameraRig({ cameraTarget, currentIndex, rocketPoints, moonPoints }) {
 }
 
 // Membuat garis lintasan
+// Membuat garis lintasan
 function Trajectory({ points, color, label, onHover }) {
   const geometry = useMemo(() => {
     return new THREE.BufferGeometry().setFromPoints(
@@ -125,14 +162,22 @@ function Trajectory({ points, color, label, onHover }) {
     return () => geometry.dispose();
   }, [geometry]);
 
+  const handlePointerMove = (event) => {
+    event.stopPropagation();
+    onHover?.({
+      label,
+      color,
+      x: event.clientX,
+      y: event.clientY,
+    });
+  };
+
   return (
     <line
       geometry={geometry}
-      onPointerOver={(event) => {
-        event.stopPropagation();
-        onHover({ label, color });
-      }}
-      onPointerOut={() => onHover(null)}
+      onPointerOver={handlePointerMove}
+      onPointerMove={handlePointerMove}
+      onPointerOut={() => onHover?.(null)}
     >
       <lineBasicMaterial color={color} transparent opacity={0.8} />
     </line>
@@ -188,24 +233,6 @@ function Moon({ points, currentIndex }) {
         metalness={0}
       />
     </mesh>
-  );
-}
-
-// Roket
-function Rocket({ points, currentIndex }) {
-  if (!points || points.length === 0) return null;
-  const index = Math.min(currentIndex, points.length - 1);
-  const [x, y, z] = points[index];
-  return (
-    <group position={[x, z, -y]}>
-      <mesh>
-        <boxGeometry args={[0.002, 0.002, 0.005]} />
-        <meshStandardMaterial
-          color={SCENE_COLORS.ROCKET_TRAJECTORY}
-          emissive="#7a3510"
-        />
-      </mesh>
-    </group>
   );
 }
 

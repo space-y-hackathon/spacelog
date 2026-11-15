@@ -2,6 +2,7 @@ import launchTower from './launch_tower.png';
 import logo from './logo/logo-putih.png';
 import earth from './texture/earth-map.jpg';
 import moon from './texture/moon-map.jpg';
+import missionSelect from './tutorial/mission-select.png';
 
 export const SCENE_ASSETS = {
   launchTower,
@@ -14,6 +15,10 @@ export const LOGO = {
 export const TEXTURE = {
   earth,
   moon,
+}
+
+export const TUTORIAL = {
+  missionSelect,
 }
 
 const rocketImages = import.meta.glob(

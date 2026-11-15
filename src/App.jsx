@@ -27,12 +27,10 @@ export default function App() {
     setCurrentStage("breaking-news");
   };
 
-  // Main Menu
   if (!selectedMission) {
     return <MainMenu onLaunch={handleLaunch} />;
   }
 
-  // Launch Preparation
   if (currentStage === "launch") {
     return (
       <LaunchScene
@@ -43,11 +41,10 @@ export default function App() {
     );
   }
 
-  // Mission Progress
   if (currentStage === "progress") {
     return (
       <ProgresScene
-        missionId={selectedMission}
+        missionId={selectedMission === "sandbox" ? "lunar-2014" : selectedMission}
         onBack={handleBack}
         onContinue={handleMissionComplete}
       />

@@ -662,3 +662,197 @@
     width: 100%;
   }
 }
+
+.audio-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 28px;
+}
+
+.audio-setting-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.audio-setting-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #dce8f5;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.audio-setting-heading span {
+  color: #67d4f6;
+  font-weight: 700;
+}
+
+.audio-setting-item input[type="range"] {
+  width: 100%;
+  accent-color: #67d4f6;
+  cursor: pointer;
+}
+
+.audio-setting-mute {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 18px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.audio-setting-mute div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.audio-setting-mute strong {
+  color: #dce8f5;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.audio-setting-mute small {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.audio-mute-button {
+  min-width: 76px;
+  padding: 9px 15px;
+  color: #67d4f6;
+  background: rgba(103, 212, 246, 0.1);
+  border: 1px solid rgba(103, 212, 246, 0.4);
+  border-radius: 7px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.audio-mute-button:hover {
+  background: rgba(103, 212, 246, 0.2);
+}
+
+.audio-mute-button.muted {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
+.tutorial-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.tutorial-media-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 240px;
+  background: rgba(10, 16, 30, 0.75);
+  border: 1px solid rgba(120, 180, 255, 0.25);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.6);
+}
+
+.tutorial-media-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+  color: rgba(180, 210, 255, 0.75);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+
+.tutorial-text-box {
+  min-height: 4.8rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+.tutorial-text-box p {
+  margin: 0;
+  line-height: 1.55;
+  font-size: 0.92rem;
+}
+
+.tutorial-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tutorial-nav-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 105px;
+  text-align: center;
+}
+
+.tutorial-nav-btn:hover:not(:disabled) {
+  background: rgba(100, 170, 255, 0.2);
+  border-color: rgba(120, 190, 255, 0.6);
+}
+
+.tutorial-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.tutorial-finish-btn {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.6);
+  color: #e0f2fe;
+}
+
+.tutorial- indicators,
+.tutorial-indicators {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.tutorial-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.tutorial-dot.active {
+  width: 22px;
+  border-radius: 999px;
+  background: #38bdf8;
+}
