@@ -118,6 +118,7 @@ export const PANEL_CONTENT = {
 
 export const MISSION_DATA = {
   sandbox: {
+    number: "SANDBOX // FREE FLIGHT",
     title: "SANDBOX",
     brief: "Build your rocket, then launch the Lunar 2014 trajectory replay.",
     objectives: [
@@ -125,16 +126,47 @@ export const MISSION_DATA = {
       "Launch the Lunar 2014 trajectory",
     ],
   },
-  artemis_1: {
-    title: "ARTEMIS 1",
-    brief: "The rival space program secured the milestone 23 days ago completed a full orbit. We are behind in the space race. We need a successful mission, and we need it now.",
+  "artemis-1": {
+    number: "MISSION 01 // UNCREWED TEST",
+    title: "ARTEMIS I",
+    brief: "Uncrewed lunar distant retrograde orbit test flight to validate the SLS rocket and Orion spacecraft systems before crewed operations.",
     objectives: [
-      "Ignition & Ascent",
-      "Suborbital Maneuver",
-      "Atmospheric Descent",
+      "Assemble the SLS & Orion launch vehicle",
+      "Execute Translunar Injection & Lunar Flyby",
+      "Complete high-speed atmospheric reentry and splashdown",
     ],
-  }
-}
+  },
+  "artemis-2": {
+    number: "MISSION 02 // CREWED FLYBY",
+    title: "ARTEMIS II",
+    brief: "First crewed flight test of the Artemis program, carrying four astronauts on a free-return trajectory around the far side of the Moon.",
+    objectives: [
+      "Assemble the crew-rated launch vehicle",
+      "Perform hybrid free-return lunar flyby",
+      "Safely return crew via Pacific splashdown",
+    ],
+  },
+  "artemis-3": {
+    number: "MISSION 03 // LEO RENDEZVOUS",
+    title: "ARTEMIS III",
+    brief: "Low Earth Orbit multi-lander rendezvous and docking test between the Orion capsule, SpaceX Starship HLS, and Blue Origin Blue Moon.",
+    objectives: [
+      "Assemble the Orion launch configuration",
+      "Rendezvous and dock with SpaceX Starship HLS",
+      "Undock, rendezvous with Blue Origin Blue Moon, and return",
+    ],
+  },
+  "lunar-2014": {
+    number: "ARCHIVED // HISTORICAL DATA",
+    title: "LUNAR 2014",
+    brief: "Historical cislunar trajectory reconstruction utilizing 2014 orbital coordinate datasets and gravitational slingshot telemetry.",
+    objectives: [
+      "Assemble the launch vehicle",
+      "Follow the historical 2014 cislunar trajectory",
+      "Verify orbital mechanics and Earth reentry",
+    ],
+  },
+};
 
 export const PLAYBACK_INTERVAL = 100;
 

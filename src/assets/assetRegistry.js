@@ -3,6 +3,10 @@ import logo from './logo/logo-putih.png';
 import earth from './texture/earth-map.jpg';
 import moon from './texture/moon-map.jpg';
 import missionSelect from './tutorial/mission-select.png';
+import assembly from './tutorial/assembly.png';
+import preFlight from './tutorial/pre-flight.png';
+import flight from './tutorial/flight.png';
+import breakingNews from './tutorial/breaking-news.png';
 
 export const SCENE_ASSETS = {
   launchTower,
@@ -19,6 +23,10 @@ export const TEXTURE = {
 
 export const TUTORIAL = {
   missionSelect,
+  assembly,
+  preFlight,
+  flight,
+  breakingNews,
 }
 
 const rocketImages = import.meta.glob(
