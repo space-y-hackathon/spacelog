@@ -141,3 +141,46 @@ export const SCENE_COLORS = {
   MOON_TRAJECTORY: "#a0a0a0",
   FINISH_MARKER: "#22c55e",
 };
+
+export const TUTORIAL_STEPS = [
+  {
+    step: "01",
+    title: "INITIATE & SELECT MISSION",
+    image: "",
+    alt: "Step 1: Main menu PLAY button and Mission Selection interface",
+    description:
+      "Click PLAY on the main menu and select your target historical or deep-space mission. Review the mission brief, payload requirements, and target orbital parameters before entering the hangar."
+  },
+  {
+    step: "02",
+    title: "VEHICLE ASSEMBLY & TIPS",
+    image: "",
+    alt: "Step 2: Rocket assembly hangar with staging components and engineering tips",
+    description:
+      "Assemble your launch vehicle stage by stage. Follow the on-screen engineering tips to balance thrust-to-weight ratio, fuel capacity, and aerodynamics for your specific payload."
+  },
+  {
+    step: "03",
+    title: "PRE-FLIGHT CHECK & LAUNCH",
+    image: "",
+    alt: "Step 3: Pre-flight validation checklist and Launch Pad ignition button",
+    description:
+      "Proceed to the launch pad for pre-flight validation. Keep in mind: if your rocket configuration does not meet the mission specifications, launch sequence will be locked until corrected."
+  },
+  {
+    step: "04",
+    title: "MISSION FLIGHT SIMULATION",
+    image: "",
+    alt: "Step 4: Real-time orbital trajectory and telemetry flight simulation",
+    description:
+      "Monitor real-time telemetry, stage separations, and orbital burns as your spacecraft executes the flight path. Watch physics in action from liftoff to final orbit insertion."
+  },
+  {
+    step: "05",
+    title: "HEADLINES & MISSION ACCOMPLISHED",
+    image: "",
+    alt: "Step 5: Mission Accomplished summary screen and Breaking News headline",
+    description:
+      "Achieve your primary objectives to trigger Mission Accomplished! Read the global Breaking News coverage celebrating your historic milestone and complete your mission log."
+  }
+];

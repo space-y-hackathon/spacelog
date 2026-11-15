@@ -11,9 +11,53 @@ import { BGM, SFX } from "../assets/audioRegistry";
 
 import "./MainMenu.css";
 
+const TUTORIAL_STEPS = [
+  {
+    step: "01",
+    title: "INITIATE & SELECT MISSION",
+    image: "",
+    alt: "Step 1: Main menu PLAY button and Mission Selection interface",
+    description:
+      "Click PLAY on the main menu and select your target historical or deep-space mission. Review the mission brief, payload requirements, and target orbital parameters before entering the hangar."
+  },
+  {
+    step: "02",
+    title: "VEHICLE ASSEMBLY & TIPS",
+    image: "",
+    alt: "Step 2: Rocket assembly hangar with staging components and engineering tips",
+    description:
+      "Assemble your launch vehicle stage by stage. Follow the on-screen engineering tips to balance thrust-to-weight ratio, fuel capacity, and aerodynamics for your specific payload."
+  },
+  {
+    step: "03",
+    title: "PRE-FLIGHT CHECK & LAUNCH",
+    image: "",
+    alt: "Step 3: Pre-flight validation checklist and Launch Pad ignition button",
+    description:
+      "Proceed to the launch pad for pre-flight validation. Keep in mind: if your rocket configuration does not meet the mission specifications, launch sequence will be locked until corrected."
+  },
+  {
+    step: "04",
+    title: "MISSION FLIGHT SIMULATION",
+    image: "",
+    alt: "Step 4: Real-time orbital trajectory and telemetry flight simulation",
+    description:
+      "Monitor real-time telemetry, stage separations, and orbital burns as your spacecraft executes the flight path. Watch physics in action from liftoff to final orbit insertion."
+  },
+  {
+    step: "05",
+    title: "HEADLINES & MISSION ACCOMPLISHED",
+    image: "",
+    alt: "Step 5: Mission Accomplished summary screen and Breaking News headline",
+    description:
+      "Achieve your primary objectives to trigger Mission Accomplished! Read the global Breaking News coverage celebrating your historic milestone and complete your mission log."
+  }
+];
+
 export default function MainMenu({ onLaunch }) {
   const [activeVehicle, setActiveVehicle] = useState(0);
   const [activePanel, setActivePanel] = useState(null);
+  const [tutorialStep, setTutorialStep] = useState(0);
   const [typedDescription, setTypedDescription] = useState("");
 
   const [bgmVolume, setBgmVolume] = useState(audioManager.bgmVolume);
@@ -21,6 +65,7 @@ export default function MainMenu({ onLaunch }) {
   const [isMuted, setIsMuted] = useState(audioManager.muted);
 
   const panel = activePanel ? PANEL_CONTENT[activePanel] : null;
+  const currentTutorial = TUTORIAL_STEPS[tutorialStep];
 
   const playButtonClick = () => {
     audioManager.playSFX(SFX.buttonClick);
@@ -32,26 +77,6 @@ export default function MainMenu({ onLaunch }) {
 
   useEffect(() => {
     audioManager.preloadSFX(Object.values(SFX));
-  }, []);
-
-  useEffect(() => {
-    if (!activePanel) return;
-
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setActivePanel(null);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [activePanel]);
-
-  useEffect(() => {
-    audioManager.preloadSFX(Object.values(SFX));
     audioManager.playBGM(BGM.mainMenu);
 
     return () => {
@@ -59,36 +84,71 @@ export default function MainMenu({ onLaunch }) {
     };
   }, []);
 
-  // Tutorial typing animation
+  // Reset slide tutorial ke awal setiap kali membuka modal tutorial
+  useEffect(() => {
+    if (activePanel === "tutorial") {
+      setTutorialStep(0);
+    }
+  }, [activePanel]);
+
+  // Navigasi Keyboard (Escape untuk tutup, Arrow Left/Right untuk geser slide tutorial)
+  useEffect(() => {
+    if (!activePanel) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setActivePanel(null);
+      } else if (activePanel === "tutorial") {
+        if (event.key === "ArrowRight") {
+          setTutorialStep((prev) => Math.min(prev + 1, TUTORIAL_STEPS.length - 1));
+        } else if (event.key === "ArrowLeft") {
+          setTutorialStep((prev) => Math.max(prev - 1, 0));
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activePanel]);
+
+  // Efek mengetik (typing animation) setiap pindah slide tutorial
   useEffect(() => {
     if (activePanel !== "tutorial") {
       setTypedDescription("");
       return;
     }
 
-    const fullText = PANEL_CONTENT.tutorial.description;
+    const fullText = TUTORIAL_STEPS[tutorialStep].description;
     let index = 0;
 
     setTypedDescription("");
 
     const timer = window.setInterval(() => {
       index += 1;
-
       setTypedDescription(fullText.slice(0, index));
 
       if (index >= fullText.length) {
         window.clearInterval(timer);
       }
-    }, 18);
+    }, 14);
 
     return () => window.clearInterval(timer);
-  }, [activePanel]);
+  }, [activePanel, tutorialStep]);
+
+  const handlePrevSlide = () => {
+    playButtonClick();
+    setTutorialStep((prev) => Math.max(prev - 1, 0));
+  };
+
+  const handleNextSlide = () => {
+    playButtonClick();
+    setTutorialStep((prev) => Math.min(prev + 1, TUTORIAL_STEPS.length - 1));
+  };
 
   const handleLaunch = () => {
     if (!activePanel?.startsWith("launch_")) return;
 
     const missionId = activePanel.replace("launch_", "");
-
     const availableMissions = ["artemis_1", "lunar_2014"];
 
     if (!availableMissions.includes(missionId)) {
@@ -107,21 +167,18 @@ export default function MainMenu({ onLaunch }) {
 
   const handleBgmVolume = (value) => {
     const volume = Number(value);
-
     setBgmVolume(volume);
     audioManager.setBGMVolume(volume);
   };
 
   const handleSfxVolume = (value) => {
     const volume = Number(value);
-
     setSfxVolume(volume);
     audioManager.setSFXVolume(volume);
   };
 
   const handleMute = () => {
     const nextMuted = !isMuted;
-
     setIsMuted(nextMuted);
     audioManager.setMute(nextMuted);
   };
@@ -193,22 +250,98 @@ export default function MainMenu({ onLaunch }) {
       {/* Modal */}
       {panel && (
         <Modal onClose={() => setActivePanel(null)}>
-          <span className="modal-kicker">{panel.kicker}</span>
+          <span className="modal-kicker">
+            {activePanel === "tutorial"
+              ? `${panel.kicker} // STEP ${currentTutorial.step} OF 0${TUTORIAL_STEPS.length}`
+              : panel.kicker}
+          </span>
 
-          <h2>{panel.title}</h2>
+          <h2>
+            {activePanel === "tutorial" ? currentTutorial.title : panel.title}
+          </h2>
 
+          {/* Tampilan Khusus Slider Tutorial */}
           {activePanel === "tutorial" ? (
-            <p>
-              <span className="visually-hidden">{panel.description}</span>
+            <div className="tutorial-slider">
+              {/* Frame Gambar 16:9 Statis / Terkunci */}
+              <div className="tutorial-media-frame">
+                <img
+                  src={currentTutorial.image}
+                  alt={currentTutorial.alt}
+                  className="tutorial-media-img"
+                />
+              </div>
 
-              <span className="tutorial-typed-text" aria-hidden="true">
-                {typedDescription}
-              </span>
-            </p>
+              {/* Box Deskripsi dengan Tinggi Tetap agar Modal Tidak Berubah Ukuran */}
+              <div className="tutorial-text-box">
+                <p>
+                  <span className="visually-hidden">
+                    {currentTutorial.description}
+                  </span>
+                  <span className="tutorial-typed-text" aria-hidden="true">
+                    {typedDescription}
+                  </span>
+                </p>
+              </div>
+
+              {/* Navigasi Slider Left / Dots / Right */}
+              <div className="tutorial-controls">
+                <button
+                  type="button"
+                  className="tutorial-nav-btn"
+                  onClick={handlePrevSlide}
+                  onMouseEnter={playButtonHover}
+                  disabled={tutorialStep === 0}
+                >
+                  ← PREV
+                </button>
+
+                <div className="tutorial-indicators" aria-label="Slide Steps">
+                  {TUTORIAL_STEPS.map((item, idx) => (
+                    <button
+                      key={item.step}
+                      type="button"
+                      className={`tutorial-dot ${
+                        idx === tutorialStep ? "active" : ""
+                      }`}
+                      onClick={() => {
+                        playButtonClick();
+                        setTutorialStep(idx);
+                      }}
+                      aria-label={`Go to step ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+
+                {tutorialStep < TUTORIAL_STEPS.length - 1 ? (
+                  <button
+                    type="button"
+                    className="tutorial-nav-btn"
+                    onClick={handleNextSlide}
+                    onMouseEnter={playButtonHover}
+                  >
+                    NEXT →
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="tutorial-nav-btn tutorial-finish-btn"
+                    onClick={() => {
+                      playButtonClick();
+                      setActivePanel("play");
+                    }}
+                    onMouseEnter={playButtonHover}
+                  >
+                    START MISSION →
+                  </button>
+                )}
+              </div>
+            </div>
           ) : (
             <p>{panel.description}</p>
           )}
 
+          {/* Panel Settings */}
           {activePanel === "settings" && (
             <div className="audio-settings">
               <div className="audio-setting-item">
@@ -264,8 +397,9 @@ export default function MainMenu({ onLaunch }) {
             </div>
           )}
 
-          {/* Pilihan panel */}
+          {/* Pilihan Panel Lain (Play / Select Mission) */}
           {activePanel !== "settings" &&
+            activePanel !== "tutorial" &&
             panel.options?.map((option) => (
               <button
                 key={option.title}
@@ -287,7 +421,7 @@ export default function MainMenu({ onLaunch }) {
             ))}
 
           {/* Tombol Launch */}
-          {activePanel.startsWith("launch_") && (
+          {activePanel?.startsWith("launch_") && (
             <button
               type="button"
               className="modal-option"
