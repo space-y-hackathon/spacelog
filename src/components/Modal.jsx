@@ -1,3 +1,10 @@
+import audioManager from "../audioManager";
+import { SFX } from "../assets/audioRegistry";
+
+const playButtonClick = () => {
+  audioManager.playSFX(SFX.buttonClick);
+};
+
 const Modal = ({
   children,
   onClose,
@@ -19,7 +26,10 @@ const Modal = ({
         <button
           type="button"
           className="modal-close"
-          onClick={onClose}
+          onClick={() => {
+            playButtonClick();
+            onClose();
+          }}
           aria-label="Close"
         >
           ×
@@ -28,6 +38,6 @@ const Modal = ({
       {children}
     </section>
   </div>
-)
+);
 
 export default Modal

@@ -1,4 +1,3 @@
-// src/data/scenarios/lunar/adapter.js
 import { lunarTrajectoryData } from "./lunarTrajectory.js";
 import { lunarOrbitData } from "./lunarOrbit.js";
 import { CELESTIAL_RADII, MISSION_SCALES } from '../../../constants';
@@ -9,7 +8,7 @@ const SURFACE_RADIUS_KM = VISUAL_EARTH_RADIUS / LUNAR_SCALE;
 
 const LAUNCH_STEPS = 45;
 const LANDING_STEPS = 45;
-const TRANSFER_STEP_SECONDS = 480; // 8 menit per step peluncuran/reentry
+const TRANSFER_STEP_SECONDS = 480; 
 
 const MONTHS = {
   jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,

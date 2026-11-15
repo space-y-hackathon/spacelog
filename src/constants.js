@@ -136,19 +136,17 @@ export const MISSION_DATA = {
   }
 }
 
-// --- KONSTANTA SIMULASI & SCENE 3D ---
-
-export const PLAYBACK_INTERVAL = 100; // interval animasi di ProgresScene.jsx
+export const PLAYBACK_INTERVAL = 100;
 
 export const SCENE_SCALE = 0.000006;
 
 export const CELESTIAL_RADII = {
-  EARTH: 6371 * SCENE_SCALE, // dipakai di ArtemisScene, LunarScene, & lunar/adapter
-  MOON: 1737.4 * SCENE_SCALE, // dipakai di LunarScene
+  EARTH: 6371 * SCENE_SCALE,
+  MOON: 1737.4 * SCENE_SCALE,
 };
 
 export const MISSION_SCALES = {
-  LUNAR_2014: SCENE_SCALE, // skala koordinat di data/scenarios/lunar/adapter.js
+  LUNAR_2014: SCENE_SCALE,
 };
 
 export const SCENE_COLORS = {

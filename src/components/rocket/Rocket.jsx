@@ -67,8 +67,6 @@ export default function Rocket({ installedParts, setInstalledParts, missingZones
       return;
     }
 
-    // Slot yang sudah terisi tetap boleh dipilih.
-    // Komponen lama akan digantikan oleh komponen baru.
     const nearest = compatibleZones
       .map((zone) => ({
         zone,
@@ -114,7 +112,6 @@ export default function Rocket({ installedParts, setInstalledParts, missingZones
     );
   };
 
-  // Hitung berdasarkan komponen yang benar-benar terpasang.
   const installedSummary = useMemo(() => {
     const grouped = {};
 
