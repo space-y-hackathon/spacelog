@@ -1,12 +1,33 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import MissionScene from "./MissionScene";
+import Button from "../../components/Button";
+import Modal from "../../components/Modal";
 import "./ProgresScene.css";
 import { artemis1Trajectory } from "../../data/scenarios/artemis-1/adapter.js";
-import { PLAYBACK_INTERVAL } from '../../constants';
-import { getLunar2014MissionData, parseLunarTimestampMs } from "../../data/scenarios/lunar/adapter.js";
+import { PLAYBACK_INTERVAL } from "../../constants";
+import {
+  getLunar2014MissionData,
+  parseLunarTimestampMs,
+} from "../../data/scenarios/lunar/adapter.js";
+import { getArtemis2MissionData } from "../../data/scenarios/artemis-2/adapter.js";
+import {
+  getArtemis3MissionData,
+  ARTEMIS3_PHASES,
+  getArtemis3HudData,
+} from "../../data/scenarios/artemis-3/adapter.js";
 
 const SPEED_OPTIONS = [1, 2, 4, 10, 25];
 const EARTH_MU_KM3_S2 = 398600.4418; // Parameter gravitasi standar Bumi (km³/s²)
+const MISSION_HEADLINES = {
+  "artemis-3":
+    "BREAKING: Artemis III crew completes dual LEO rendezvous and docking operations with SpaceX Starship HLS and Blue Origin Blue Moon.",
+  "artemis-2":
+    "BREAKING: Artemis II crewed Orion spacecraft completes cislunar free-return flyby and Pacific splashdown.",
+  "artemis-1":
+    "BREAKING: Orion spacecraft completes uncrewed lunar distant retrograde orbit and Pacific splashdown, clearing the path for crewed Artemis II.",
+  "lunar-2014":
+    "ARCHIVED TELEMETRY: Cislunar trajectory replay complete — orbital mechanics and gravitational slingshot data verified.",
+};
 
 function formatNumber(value, digits = 2) {
   if (
@@ -22,7 +43,11 @@ function formatNumber(value, digits = 2) {
 }
 
 function getArtemisDate(timestamp) {
-  const date = new Date(timestamp);
+  const timestampText = String(timestamp);
+  const normalizedTimestamp = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(timestampText)
+    ? timestampText
+    : `${timestampText}Z`;
+  const date = new Date(normalizedTimestamp);
   if (Number.isNaN(date.getTime())) {
     return {
       Date: "N/A",
@@ -115,24 +140,24 @@ function calculateVelocity(coordinates, index) {
   return Math.hypot(dx, dy, dz) / dtSeconds;
 }
 
-// Hitung jarak roket ke Bulan dalam km jika data moonPoints tersedia
-function calculateDistanceToMoon(currentPoint, rocketPoints, moonPoints, index) {
+// Hitung jarak roket ke target (Bulan atau wahana lain) dalam km dari koordinat scene
+function calculateDistanceToMoon(currentPoint, rocketPoints, targetPoints, index) {
   if (
     !currentPoint ||
     !rocketPoints ||
-    !moonPoints ||
+    !targetPoints ||
     rocketPoints.length === 0 ||
-    moonPoints.length === 0
+    targetPoints.length === 0
   ) {
     return null;
   }
 
   const rIdx = Math.min(Math.max(index, 0), rocketPoints.length - 1);
-  const mIdx = Math.min(Math.max(index, 0), moonPoints.length - 1);
+  const tIdx = Math.min(Math.max(index, 0), targetPoints.length - 1);
 
   const rocketScene = rocketPoints[rIdx];
-  const moonScene = moonPoints[mIdx];
-  if (!rocketScene || !moonScene) return null;
+  const targetScene = targetPoints[tIdx];
+  if (!rocketScene || !targetScene) return null;
 
   const rawDistEarth = Math.hypot(
     Number(currentPoint.X),
@@ -154,19 +179,31 @@ function calculateDistanceToMoon(currentPoint, rocketPoints, moonPoints, index) 
   }
 
   const kmPerSceneUnit = rawDistEarth / sceneDistEarth;
-  const sceneDistMoon = Math.hypot(
-    Number(rocketScene[0]) - Number(moonScene[0]),
-    Number(rocketScene[1]) - Number(moonScene[1]),
-    Number(rocketScene[2]) - Number(moonScene[2])
+  const sceneDistTarget = Math.hypot(
+    Number(rocketScene[0]) - Number(targetScene[0]),
+    Number(rocketScene[1]) - Number(targetScene[1]),
+    Number(rocketScene[2]) - Number(targetScene[2])
   );
 
-  if (!Number.isFinite(sceneDistMoon)) return null;
-  return sceneDistMoon * kmPerSceneUnit;
+  if (!Number.isFinite(sceneDistTarget)) return null;
+  return sceneDistTarget * kmPerSceneUnit;
+}
+
+function formatMissionDuration(startTimestamp, endTimestamp) {
+  if (startTimestamp === null || endTimestamp === null) return "N/A";
+
+  const durationHours = Math.floor(
+    Math.max(0, endTimestamp - startTimestamp) / 3_600_000
+  );
+  const days = Math.floor(durationHours / 24);
+  const hours = durationHours % 24;
+  return `${days} DAYS ${hours} HRS`;
 }
 
 export default function ProgresScene({
   missionId = "lunar-2014",
   onBack,
+  onContinue,
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -176,11 +213,40 @@ export default function ProgresScene({
   const [cameraTarget, setCameraTarget] = useState("earth");
   const [showLeft, setShowLeft] = useState(true);
   const [showBottom, setShowBottom] = useState(true);
+  const [hoveredTrajectory, setHoveredTrajectory] = useState(null);
 
   const trackRef = useRef(null);
 
   // Pilih dataset berdasarkan misi
   const missionData = useMemo(() => {
+    if (missionId === "artemis-3") {
+      const artemis3 = getArtemis3MissionData();
+      return {
+        id: "artemis-3",
+        name: "ARTEMIS III",
+        coordinates: artemis3.coordinates,
+        moonPoints: artemis3.moonPoints,
+        rocketPoints: artemis3.rocketPoints,
+        starshipPoints: artemis3.starshipPoints,
+        blueMoonPoints: artemis3.blueMoonPoints,
+        progressStart: "KSC LAUNCH (LEO)",
+        progressEnd: "PACIFIC SPLASHDOWN",
+      };
+    }
+
+    if (missionId === "artemis-2") {
+      const artemis2 = getArtemis2MissionData();
+      return {
+        id: "artemis-2",
+        name: "ARTEMIS II",
+        coordinates: artemis2.coordinates,
+        moonPoints: artemis2.moonPoints,
+        rocketPoints: artemis2.rocketPoints,
+        progressStart: "EARTH LAUNCH",
+        progressEnd: "EARTH LANDING",
+      };
+    }
+
     if (missionId === "artemis-1") {
       const coordinates = artemis1Trajectory.map((record) => {
         const dateInfo = getArtemisDate(record.timestamp);
@@ -207,12 +273,8 @@ export default function ProgresScene({
         id: "artemis-1",
         name: "ARTEMIS I",
         coordinates,
-        moonPoints: coordinates.map(
-          (point) => point.moonVisualPosition
-        ),
-        rocketPoints: coordinates.map(
-          (point) => point.visualPosition
-        ),
+        moonPoints: coordinates.map((point) => point.moonVisualPosition),
+        rocketPoints: coordinates.map((point) => point.visualPosition),
         progressStart: "MISSION START",
         progressEnd: "MISSION END",
       };
@@ -236,6 +298,15 @@ export default function ProgresScene({
 
   // Daftar kamera otomatis mengikuti objek yang tersedia di data misi
   const cameraOptions = useMemo(() => {
+    if (missionId === "artemis-3") {
+      return [
+        { id: "earth", label: "EARTH" },
+        { id: "orion", label: "ORION" },
+        { id: "starship", label: "STARSHIP" },
+        { id: "bluemoon", label: "BLUE MOON" },
+      ];
+    }
+
     const options = [{ id: "earth", label: "EARTH" }];
     if (rocketPoints.length > 0) {
       options.push({ id: "rocket", label: "ROCKET" });
@@ -262,9 +333,14 @@ export default function ProgresScene({
 
   // Progress misi
   const progress =
-    TOTAL_POINTS > 1
-      ? (safeIndex / (TOTAL_POINTS - 1)) * 100
-      : 0;
+    TOTAL_POINTS > 1 ? (safeIndex / (TOTAL_POINTS - 1)) * 100 : 0;
+  const isMissionComplete = progress >= 100;
+
+  // Data fase & target rendezvous khusus Artemis III
+  const isArtemis3 = missionId === "artemis-3";
+  const artemis3Hud = isArtemis3
+    ? getArtemis3HudData(safeIndex, TOTAL_POINTS, currentPoint)
+    : null;
 
   // Reset playback & kamera ketika berganti misi
   useEffect(() => {
@@ -309,12 +385,10 @@ export default function ProgresScene({
   // Hentikan playback ketika mencapai ujung awal/akhir sesuai arah
   useEffect(() => {
     if (TOTAL_POINTS === 0) return;
-    if (direction === 1 && safeIndex >= TOTAL_POINTS - 1) {
-      setIsPlaying(false);
-    } else if (direction === -1 && safeIndex <= 0) {
+    if (isMissionComplete || (direction === -1 && safeIndex <= 0)) {
       setIsPlaying(false);
     }
-  }, [safeIndex, TOTAL_POINTS, direction]);
+  }, [safeIndex, TOTAL_POINTS, direction, isMissionComplete]);
 
   // Shortcut keyboard (Spasi = Play/Pause, Panah Kiri/Kanan = Step, C = Ganti Kamera)
   useEffect(() => {
@@ -327,7 +401,9 @@ export default function ProgresScene({
       } else if (e.code === "ArrowRight") {
         e.preventDefault();
         const step = e.shiftKey ? 1 : 50;
-        setCurrentIndex((prev) => Math.min(prev + step, Math.max(TOTAL_POINTS - 1, 0)));
+        setCurrentIndex((prev) =>
+          Math.min(prev + step, Math.max(TOTAL_POINTS - 1, 0))
+        );
       } else if (e.code === "ArrowLeft") {
         e.preventDefault();
         const step = e.shiftKey ? 1 : 50;
@@ -461,7 +537,39 @@ export default function ProgresScene({
     safeIndex
   );
 
-  // Parameter sistem misi
+  // Hitung jarak target rendezvous khusus Artemis III (Orion -> Starship HLS / Blue Moon)
+  const artemis3TargetPoints =
+    artemis3Hud?.phase?.target === "BLUE MOON"
+      ? missionData.blueMoonPoints
+      : missionData.starshipPoints;
+
+  const artemis3TargetRangeKm = isArtemis3
+    ? currentPoint?.dockedTo
+      ? 0
+      : calculateDistanceToMoon(
+          currentPoint,
+          rocketPoints,
+          artemis3TargetPoints,
+          safeIndex
+        ) ??
+        artemis3Hud?.targetRangeKm ??
+        null
+    : null;
+
+  const thirdMetricCard = isArtemis3
+    ? {
+        label: `TARGET RANGE (${artemis3Hud?.phase?.target ?? "STARSHIP HLS"})`,
+        value: formatNumber(artemis3TargetRangeKm, 1),
+        unit: "km",
+        description: "Distance to LEO rendezvous target",
+      }
+    : {
+        label: "DISTANCE TO MOON",
+        value: formatNumber(distanceToMoonValue, 0),
+        unit: "km",
+        description: "Distance to lunar body",
+      };
+
   // Parameter sistem misi (hanya metrik yang terhitung dari dataset)
   const systemParameters = [
     {
@@ -476,12 +584,7 @@ export default function ProgresScene({
       unit: "km/s",
       description: "Current spacecraft speed",
     },
-    {
-      label: "DISTANCE TO MOON",
-      value: formatNumber(distanceToMoonValue, 0),
-      unit: "km",
-      description: "Distance to lunar body",
-    },
+    thirdMetricCard,
     {
       label: "MISSION ELAPSED",
       value: currentPoint?.Time ?? "N/A",
@@ -494,27 +597,136 @@ export default function ProgresScene({
     (item) => item.value !== "N/A"
   ).length;
 
+  const handleMissionComplete = () => {
+    const firstPoint = coordinates[0];
+    const lastPoint = coordinates[TOTAL_POINTS - 1];
+    if (!firstPoint || !lastPoint) return;
+
+    let maxVelocity = null;
+    let closestLunarApproach = null;
+    let maxEarthDistance = null;
+
+    coordinates.forEach((point, index) => {
+      const velocity = calculateVelocity(coordinates, index);
+      if (Number.isFinite(velocity)) {
+        maxVelocity = Math.max(maxVelocity ?? velocity, velocity);
+      }
+
+      const lunarDistance = calculateDistanceToMoon(
+        point,
+        rocketPoints,
+        moonPoints,
+        index
+      );
+      if (Number.isFinite(lunarDistance)) {
+        closestLunarApproach = Math.min(
+          closestLunarApproach ?? lunarDistance,
+          lunarDistance
+        );
+      }
+
+      const earthDistance = Math.hypot(
+        Number(point.X),
+        Number(point.Y),
+        Number(point.Z)
+      );
+      if (Number.isFinite(earthDistance)) {
+        maxEarthDistance = Math.max(
+          maxEarthDistance ?? earthDistance,
+          earthDistance
+        );
+      }
+    });
+
+    const startTimestamp = parsePointTimestampMs(firstPoint);
+    const endTimestamp = parsePointTimestampMs(lastPoint);
+
+    onContinue({
+      missionName: missionData.name,
+      displayMissionName: missionData.name.replace(/^ARCHIVED\s*\/\/\s*/, ""),
+      sampleCount: TOTAL_POINTS,
+      completionDate: lastPoint.Date,
+      completionTime: lastPoint.Time,
+      finalPosition: {
+        x: formatNumber(lastPoint.X),
+        y: formatNumber(lastPoint.Y),
+        z: formatNumber(lastPoint.Z),
+      },
+      startDate: firstPoint.Date,
+      endDate: lastPoint.Date,
+      duration: formatMissionDuration(startTimestamp, endTimestamp),
+      maxVelocity: formatNumber(maxVelocity, 2),
+      closestLunarApproach: formatNumber(closestLunarApproach, 0),
+      maxEarthDistance: formatNumber(maxEarthDistance, 0),
+      headline:
+        MISSION_HEADLINES[missionId] ??
+        `${missionData.name} trajectory replay complete.`,
+    });
+  };
+
   return (
-    <main
-      className={`progress-scene ${showBottom ? "" : "bottom-hidden"
-        }`}
-    >
+    <main className={`progress-scene ${showBottom ? "" : "bottom-hidden"}`}>
       {/* 3D Visualization */}
       <section className="mission-visual">
         <MissionScene
           missionId={missionId}
           currentIndex={safeIndex}
+          dockingBlend={currentPoint?.dockingBlend}
           moonPoints={moonPoints}
           rocketPoints={rocketPoints}
+          starshipPoints={missionData.starshipPoints ?? []}
+          blueMoonPoints={missionData.blueMoonPoints ?? []}
+          dockedTo={currentPoint?.dockedTo ?? null}
           cameraTarget={activeCameraTarget}
+          onTrajectoryHover={setHoveredTrajectory}
         />
       </section>
 
+      {hoveredTrajectory && (
+        <div
+          className="trajectory-legend"
+          role="status"
+          style={
+            typeof hoveredTrajectory.x === "number" &&
+            typeof hoveredTrajectory.y === "number"
+              ? {
+                  left: `${hoveredTrajectory.x}px`,
+                  top: `${hoveredTrajectory.y}px`,
+                  transform:
+                    hoveredTrajectory.x > window.innerWidth - 220
+                      ? "translate(calc(-100% - 14px), -50%)"
+                      : "translate(14px, -50%)",
+                }
+              : undefined
+          }
+        >
+          <span
+            className="trajectory-legend-swatch"
+            style={{ backgroundColor: hoveredTrajectory.color }}
+          />
+          {hoveredTrajectory.label}
+        </div>
+      )}
+
+      {isMissionComplete && (
+        <Modal dismissible={false} ariaLabel="Mission success">
+          <div className="mission-success">
+            <span className="modal-kicker">MISSION COMPLETE</span>
+            <h2>Mission successful</h2>
+            <p>{missionData.name} reached the final recorded waypoint.</p>
+            <Button
+              variant="primary"
+              className="mission-success-action"
+              onClick={handleMissionComplete}
+            >
+              Continue
+            </Button>
+          </div>
+        </Modal>
+      )}
+
       {/* Back Button */}
-      <button
-        className="progress-back"
-        onClick={onBack}
-      >
+      <button className="progress-back" onClick={onBack}>
         ← BACK
       </button>
 
@@ -530,8 +742,9 @@ export default function ProgresScene({
             <button
               key={cam.id}
               type="button"
-              className={`camera-btn ${activeCameraTarget === cam.id ? "active" : ""
-                }`}
+              className={`camera-btn ${
+                activeCameraTarget === cam.id ? "active" : ""
+              }`}
               onClick={() => setCameraTarget(cam.id)}
               title={`Fokus kamera ke ${cam.label} (Shortcut: C)`}
             >
@@ -544,7 +757,7 @@ export default function ProgresScene({
       {/* Mission Progress */}
       <section className="mission-progress-panel">
         <div className="progress-heading">
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div className="progress-title-group">
             <span
               style={{
                 color: "#ffffff",
@@ -559,6 +772,11 @@ export default function ProgresScene({
             <span style={{ color: "#94a3b8", fontSize: "11px" }}>
               MISSION PROGRESS
             </span>
+            {artemis3Hud?.phase && (
+              <span className="mission-phase-badge">
+                PHASE {artemis3Hud.phase.id}: {artemis3Hud.phase.label}
+              </span>
+            )}
           </div>
           <strong>{progress.toFixed(1)}%</strong>
         </div>
@@ -574,10 +792,19 @@ export default function ProgresScene({
           onDragStart={(e) => e.preventDefault()}
           style={{ cursor: "pointer", touchAction: "none", userSelect: "none" }}
         >
-          <div
-            className="progress-fill"
-            style={{ width: `${progress}%` }}
-          />
+          {isArtemis3 &&
+            ARTEMIS3_PHASES.slice(1).map((phase) => (
+              <div
+                key={phase.id}
+                className={`progress-milestone-tick ${
+                  (artemis3Hud?.phase?.id ?? 1) >= phase.id ? "passed" : ""
+                }`}
+                style={{ left: `${phase.start * 100}%` }}
+                title={`Phase ${phase.id}: ${phase.label}`}
+              />
+            ))}
+
+          <div className="progress-fill" style={{ width: `${progress}%` }} />
 
           <div
             className="progress-indicator"
@@ -625,7 +852,12 @@ export default function ProgresScene({
               }}
             >
               {isPlaying && direction === 1 ? (
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="currentColor"
+                >
                   <rect x="2" y="1.5" width="3" height="9" rx="0.5" />
                   <rect x="7" y="1.5" width="3" height="9" rx="0.5" />
                 </svg>
@@ -650,21 +882,17 @@ export default function ProgresScene({
 
       {/* Left: Rocket Telemetry */}
       <section
-        className={`rocket-statistics ${showLeft ? "" : "hidden-left"
-          }`}
+        className={`rocket-statistics ${showLeft ? "" : "hidden-left"}`}
       >
         <div className="statistics-heading">
           <div>
-            <span className="statistics-kicker">
-              LIVE TELEMETRY
-            </span>
+            <span className="statistics-kicker">LIVE TELEMETRY</span>
 
             <h3>Rocket Statistics</h3>
           </div>
 
           <span
-            className={`live-indicator ${isPlaying ? "active" : "paused"
-              }`}
+            className={`live-indicator ${isPlaying ? "active" : "paused"}`}
           >
             ● {isPlaying ? (direction === -1 ? "REWIND" : "LIVE") : "PAUSED"}
           </span>
@@ -688,14 +916,11 @@ export default function ProgresScene({
 
       {/* Bottom: Mission Systems */}
       <section
-        className={`mission-systems-panel ${showBottom ? "" : "hidden-bottom"
-          }`}
+        className={`mission-systems-panel ${showBottom ? "" : "hidden-bottom"}`}
       >
         <div className="systems-heading">
           <div>
-            <span className="statistics-kicker">
-              SPACECRAFT CONDITION
-            </span>
+            <span className="statistics-kicker">SPACECRAFT CONDITION</span>
           </div>
 
           <h3>Mission Systems</h3>
@@ -705,7 +930,7 @@ export default function ProgresScene({
           </span>
         </div>
 
-        <div className="systems-grid" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
+        <div className="systems-grid">
           {systemParameters.map((item) => (
             <div className="system-item" key={item.label}>
               <span>{item.label}</span>
@@ -723,13 +948,10 @@ export default function ProgresScene({
 
       {/* Toggle: sidebar kiri */}
       <button
-        className={`panel-toggle toggle-left ${showLeft ? "open" : "closed"
-          }`}
+        className={`panel-toggle toggle-left ${showLeft ? "open" : "closed"}`}
         onClick={() => setShowLeft((value) => !value)}
         aria-label={
-          showLeft
-            ? "Sembunyikan telemetry"
-            : "Tampilkan telemetry"
+          showLeft ? "Sembunyikan telemetry" : "Tampilkan telemetry"
         }
       >
         {showLeft ? "◀" : "▶"}
@@ -737,8 +959,9 @@ export default function ProgresScene({
 
       {/* Toggle: panel bawah */}
       <button
-        className={`panel-toggle toggle-bottom ${showBottom ? "open" : "closed"
-          }`}
+        className={`panel-toggle toggle-bottom ${
+          showBottom ? "open" : "closed"
+        }`}
         onClick={() => setShowBottom((value) => !value)}
         aria-label={
           showBottom

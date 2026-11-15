@@ -4,13 +4,16 @@ import { Canvas } from "@react-three/fiber";
 
 import LaunchTower from "../../components/LaunchTower";
 import Rocket from "../../components/rocket/Rocket";
+import { getMissingRequiredZones } from "../../components/rocket/Blueprint";
 
 import { MISSION_DATA } from "../../constants";
 
 import "./LaunchScene.css";
 
 export default function LaunchScene({ missionId, onLaunch, onBack }) {
+  const [installedParts, setInstalledParts] = useState([]);
   const [assemblyResetKey, setAssemblyResetKey] = useState(0);
+  const missingZones = getMissingRequiredZones(installedParts);
 
   const mission = MISSION_DATA[missionId] ?? {
     title: "UNKNOWN MISSION",
@@ -19,6 +22,7 @@ export default function LaunchScene({ missionId, onLaunch, onBack }) {
   };
 
   const handleReset = () => {
+    setInstalledParts([]);
     setAssemblyResetKey((prev) => prev + 1);
   };
 
@@ -95,14 +99,22 @@ export default function LaunchScene({ missionId, onLaunch, onBack }) {
       </section>
 
       {/* Rocket Assembly - CENTER + RIGHT + BOTTOM */}
-      <Rocket key={assemblyResetKey} />
+      <Rocket
+        key={assemblyResetKey}
+        installedParts={installedParts}
+        setInstalledParts={setInstalledParts}
+        missingZones={missingZones}
+      />
 
       {/* Launch Actions - BOTTOM RIGHT */}
       <div className="launch-actions">
         <button
           className="launch-button"
           type="button"
-          onClick={onLaunch}
+          disabled={missingZones.length > 0}
+          onClick={() => {
+            if (missingZones.length === 0) onLaunch();
+          }}
         >
           Launch
         </button>

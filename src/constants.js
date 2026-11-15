@@ -21,9 +21,9 @@ export const SHOWCASE_VEHICLES = [
     id: 'artemis-3',
     indexLabel: '3/3',
     name: 'ARTEMIS III',
-    subtitle: 'FUTURE LUNAR SOUTH POLE LANDING',
+    subtitle: 'LEO MULTI-LANDER DOCKING TEST',
     image: artemisRocket,
-    status: 'FUTURE PROFILE',
+    status: 'FLIGHT PROFILE // 2027',
   },
 ]
 
@@ -33,6 +33,11 @@ export const PANEL_CONTENT = {
     title: 'Choose your journey.',
     description: 'Start a free sandbox session or reconstruct an Artemis lunar mission.',
     options: [
+      {
+        title: 'SANDBOX',
+        description: 'Build a rocket and launch the Lunar 2014 trajectory.',
+        nextPanel: 'sandbox',
+      },
       {
         title: 'MISSION SCENARIO',
         description: 'Reconstruct Artemis I, Artemis II, and future Artemis III trajectories.',
@@ -56,8 +61,8 @@ export const PANEL_CONTENT = {
         nextPanel: 'launch_artemis_2',
       },
       {
-        title: 'ARTEMIS III // LUNAR LANDING',
-        description: 'NRHO rendezvous and lunar south pole descent profile.',
+        title: 'ARTEMIS III // LEO RENDEZVOUS',
+        description: 'Low Earth orbit rendezvous and docking test with Starship HLS and Blue Moon.',
         nextPanel: 'launch_artemis_3',
       },
       {
@@ -80,9 +85,9 @@ export const PANEL_CONTENT = {
     description: 'Settings panel placeholder. Audio, graphics, and control options can be added here.',
   },
   sandbox: {
-    kicker: 'COMING NEXT',
+    kicker: 'SANDBOX',
     title: 'Sandbox setup',
-    description: 'Ready to connect to the 3D orbital sandbox scene.',
+    description: 'Build a rocket with the required parts, then explore the Lunar 2014 trajectory.',
     backPanel: 'play',
   },
   launch_artemis_1: {
@@ -100,7 +105,7 @@ export const PANEL_CONTENT = {
   launch_artemis_3: {
     kicker: 'ARTEMIS III',
     title: 'Mission Ready',
-    description: 'Ready to load Artemis III lunar landing profile into the 3D mission scene.',
+    description: 'Ready to load Artemis III LEO multi-lander rendezvous trajectory into the 3D mission scene.',
     backPanel: 'scenario',
   },
   launch_lunar_2014: {
@@ -112,6 +117,14 @@ export const PANEL_CONTENT = {
 }
 
 export const MISSION_DATA = {
+  sandbox: {
+    title: "SANDBOX",
+    brief: "Build your rocket, then launch the Lunar 2014 trajectory replay.",
+    objectives: [
+      "Assemble the required rocket parts",
+      "Launch the Lunar 2014 trajectory",
+    ],
+  },
   artemis_1: {
     title: "ARTEMIS 1",
     brief: "The rival space program secured the milestone 23 days ago completed a full orbit. We are behind in the space race. We need a successful mission, and we need it now.",
