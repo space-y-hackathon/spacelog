@@ -104,7 +104,6 @@ export default function MainMenu({ onLaunch }) {
             <div className="brand-icon-box" aria-hidden="true">
               Δ
             </div>
-
             <div className="brand-text">
               <span className="brand-title">DELTA-V</span>
               <span className="brand-subtitle">
@@ -203,7 +202,6 @@ export default function MainMenu({ onLaunch }) {
                 <strong>{option.title}</strong>
                 <small>{option.description}</small>
               </span>
-
               <b>→</b>
             </button>
           ))}
