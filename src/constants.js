@@ -38,11 +38,6 @@ export const PANEL_CONTENT = {
         description: 'Reconstruct Artemis I, Artemis II, and future Artemis III trajectories.',
         nextPanel: 'scenario',
       },
-      {
-        title: 'NEW SANDBOX',
-        description: 'Build and experiment with orbital maneuvers without a fixed objective.',
-        nextPanel: 'sandbox',
-      },
     ],
   },
   scenario: {
@@ -114,6 +109,18 @@ export const PANEL_CONTENT = {
     description: "Ready to load historical lunar trajectory and orbital data.",
     backPanel: "scenario",
   },
+}
+
+export const MISSION_DATA = {
+  artemis_1: {
+    title: "ARTEMIS 1",
+    brief: "The rival space program secured the milestone 23 days ago completed a full orbit. We are behind in the space race. We need a successful mission, and we need it now.",
+    objectives: [
+      "Ignition & Ascent",
+      "Suborbital Maneuver",
+      "Atmospheric Descent",
+    ],
+  }
 }
 
 // --- KONSTANTA SIMULASI & SCENE 3D ---
