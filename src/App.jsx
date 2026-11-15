@@ -47,7 +47,7 @@ export default function App() {
   if (currentStage === "progress") {
     return (
       <ProgresScene
-        missionId={selectedMission}
+        missionId={selectedMission === "sandbox" ? "lunar-2014" : selectedMission}
         onBack={handleBack}
         onContinue={handleMissionComplete}
       />

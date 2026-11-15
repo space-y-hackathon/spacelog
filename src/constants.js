@@ -34,6 +34,11 @@ export const PANEL_CONTENT = {
     description: 'Start a free sandbox session or reconstruct an Artemis lunar mission.',
     options: [
       {
+        title: 'SANDBOX',
+        description: 'Build a rocket and launch the Lunar 2014 trajectory.',
+        nextPanel: 'sandbox',
+      },
+      {
         title: 'MISSION SCENARIO',
         description: 'Reconstruct Artemis I, Artemis II, and future Artemis III trajectories.',
         nextPanel: 'scenario',
@@ -80,9 +85,9 @@ export const PANEL_CONTENT = {
     description: 'Settings panel placeholder. Audio, graphics, and control options can be added here.',
   },
   sandbox: {
-    kicker: 'COMING NEXT',
+    kicker: 'SANDBOX',
     title: 'Sandbox setup',
-    description: 'Ready to connect to the 3D orbital sandbox scene.',
+    description: 'Build a rocket with the required parts, then explore the Lunar 2014 trajectory.',
     backPanel: 'play',
   },
   launch_artemis_1: {
@@ -112,6 +117,14 @@ export const PANEL_CONTENT = {
 }
 
 export const MISSION_DATA = {
+  sandbox: {
+    title: "SANDBOX",
+    brief: "Build your rocket, then launch the Lunar 2014 trajectory replay.",
+    objectives: [
+      "Assemble the required rocket parts",
+      "Launch the Lunar 2014 trajectory",
+    ],
+  },
   artemis_1: {
     title: "ARTEMIS 1",
     brief: "The rival space program secured the milestone 23 days ago completed a full orbit. We are behind in the space race. We need a successful mission, and we need it now.",

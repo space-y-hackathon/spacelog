@@ -208,6 +208,20 @@ export default function MainMenu({ onLaunch }) {
             </button>
           ))}
 
+          {activePanel === "sandbox" && (
+            <button
+              type="button"
+              className="modal-option"
+              onClick={() => onLaunch("sandbox")}
+            >
+              <span>
+                <strong>BUILD ROCKET</strong>
+                <small>Assemble your rocket before launching Lunar 2014.</small>
+              </span>
+              <b>→</b>
+            </button>
+          )}
+
           {/* Tombol Launch */}
           {activePanel.startsWith("launch_") && (
             <button
