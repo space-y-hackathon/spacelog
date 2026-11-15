@@ -18,12 +18,10 @@ export default function App() {
     setCurrentStage("launch");
   };
 
-  // Main Menu
   if (!selectedMission) {
     return <MainMenu onLaunch={handleLaunch} />;
   }
 
-  // Launch Preparation
   if (currentStage === "launch") {
     return (
       <LaunchScene
@@ -34,7 +32,6 @@ export default function App() {
     );
   }
 
-  // Mission Progress
   if (currentStage === "progress") {
     return (
       <ProgresScene

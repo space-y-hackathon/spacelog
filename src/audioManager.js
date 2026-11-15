@@ -74,7 +74,6 @@ class AudioManager {
   playSFX(src) {
     if (!src || this.muted) return;
 
-    // Jalur Cepat (Zero-Latency) dengan Web Audio API
     if (this.ctx && this.sfxBuffers.has(src)) {
       if (this.ctx.state === "suspended") {
         this.ctx.resume().catch(() => {});
@@ -89,7 +88,6 @@ class AudioManager {
       source.connect(gainNode);
       gainNode.connect(this.ctx.destination);
 
-      // Cari titik awal suara (otomatis melewati bagian hening di awal MP3)
       const offset = this._findAudioStartOffset(source.buffer);
       source.start(0, offset);
 
@@ -106,14 +104,12 @@ class AudioManager {
       return source;
     }
 
-    // Jika belum selesai di-decode, trigger preload untuk pemutaran berikutnya
     this.preloadSFX([src]);
   }
 
-  // Fungsi otomatis memotong "leading silence" (jeda hening di awal file MP3)
   _findAudioStartOffset(audioBuffer) {
     const channelData = audioBuffer.getChannelData(0);
-    const threshold = 0.005; // Batas minimal gelombang suara
+    const threshold = 0.005;
     for (let i = 0; i < channelData.length; i++) {
       if (Math.abs(channelData[i]) > threshold) {
         return i / audioBuffer.sampleRate;
@@ -158,7 +154,7 @@ class AudioManager {
         try {
           source.stop();
         } catch (e) {
-          // Abaikan jika sudah berhenti
+
         }
       });
       entries.clear();

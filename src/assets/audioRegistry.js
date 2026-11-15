@@ -24,9 +24,4 @@ export const SFX = {
   landRocket,
   tOffRocket,
   menuRocket
-  // componentPick,
-  // componentDrop,
-  // componentRemove,
-  // countdown,
-  // rocketLaunch,
 };

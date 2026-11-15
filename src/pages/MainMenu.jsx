@@ -34,7 +34,6 @@ export default function MainMenu({ onLaunch }) {
     audioManager.preloadSFX(Object.values(SFX));
   }, []);
 
-  // Escape untuk menutup modal
   useEffect(() => {
     if (!activePanel) return;
 
@@ -85,7 +84,6 @@ export default function MainMenu({ onLaunch }) {
     return () => window.clearInterval(timer);
   }, [activePanel]);
 
-  // Launch mission
   const handleLaunch = () => {
     if (!activePanel?.startsWith("launch_")) return;
 
