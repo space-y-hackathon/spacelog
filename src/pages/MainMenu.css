@@ -80,7 +80,7 @@
 .earth-surface {
   position: absolute;
   inset: 0;
-  background-image: url("../assets/earth-map.jpg");
+  background-image: url("../assets/texture/earth-map.jpg");
   background-size: 220% 100%;
   background-repeat: repeat-x;
   background-position: 18% center;
