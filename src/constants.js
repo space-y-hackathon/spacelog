@@ -21,9 +21,9 @@ export const SHOWCASE_VEHICLES = [
     id: 'artemis-3',
     indexLabel: '3/3',
     name: 'ARTEMIS III',
-    subtitle: 'FUTURE LUNAR SOUTH POLE LANDING',
+    subtitle: 'LEO MULTI-LANDER DOCKING TEST',
     image: artemisRocket,
-    status: 'FUTURE PROFILE',
+    status: 'FLIGHT PROFILE // 2027',
   },
 ]
 
@@ -61,8 +61,8 @@ export const PANEL_CONTENT = {
         nextPanel: 'launch_artemis_2',
       },
       {
-        title: 'ARTEMIS III // LUNAR LANDING',
-        description: 'NRHO rendezvous and lunar south pole descent profile.',
+        title: 'ARTEMIS III // LEO RENDEZVOUS',
+        description: 'Low Earth orbit rendezvous and docking test with Starship HLS and Blue Moon.',
         nextPanel: 'launch_artemis_3',
       },
       {
@@ -105,7 +105,7 @@ export const PANEL_CONTENT = {
   launch_artemis_3: {
     kicker: 'ARTEMIS III',
     title: 'Mission Ready',
-    description: 'Ready to load Artemis III lunar landing profile into the 3D mission scene.',
+    description: 'Ready to load Artemis III LEO multi-lander rendezvous trajectory into the 3D mission scene.',
     backPanel: 'scenario',
   },
   launch_lunar_2014: {

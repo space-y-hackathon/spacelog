@@ -72,6 +72,8 @@ export default function MainMenu({ onLaunch }) {
 
     const availableMissions = [
       "artemis_1",
+      "artemis_2",
+      "artemis_3",
       "lunar_2014",
     ];
 
