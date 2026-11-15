@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { LOGO } from "../assets/assetRegistry";
+import { LOGO, TUTORIAL } from "../assets/assetRegistry";
 import { PANEL_CONTENT, SHOWCASE_VEHICLES } from "../constants";
 
 import Button from "../components/Button";
@@ -15,7 +15,7 @@ const TUTORIAL_STEPS = [
   {
     step: "01",
     title: "INITIATE & SELECT MISSION",
-    image: "",
+    image: TUTORIAL.missionSelect,
     alt: "Step 1: Main menu PLAY button and Mission Selection interface",
     description:
       "Click PLAY on the main menu and select your target historical or deep-space mission. Review the mission brief, payload requirements, and target orbital parameters before entering the hangar."
