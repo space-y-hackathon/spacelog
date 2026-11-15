@@ -4,9 +4,8 @@ import { OrbitControls, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { TextureLoader } from "three";
 import { CELESTIAL_RADII, SCENE_COLORS } from "../../constants";
-import earthTexture from "../../assets/earth-map.jpg";
-import moonTexture from "../../assets/moon-map.jpg";
 import artemisTexture from "../../assets/artemis.png";
+import { TEXTURE } from "../../assets/assetRegistry";
 
 function getTargetVector(cameraTarget, currentIndex, rocketPoints, moonPoints) {
   if (cameraTarget === "rocket" && rocketPoints.length > 0) {
@@ -187,7 +186,7 @@ function Trajectory({ points, color, label, onHover }) {
 
 // Bumi
 function Earth() {
-  const texture = useLoader(TextureLoader, earthTexture);
+  const texture = useLoader(TextureLoader, TEXTURE.earth);
   texture.colorSpace = THREE.SRGBColorSpace;
   return (
     <group position={[0, 0, 0]}>
@@ -210,7 +209,7 @@ function Earth() {
 
 // Bulan
 function Moon({ points, currentIndex }) {
-  const texture = useLoader(TextureLoader, moonTexture);
+  const texture = useLoader(TextureLoader, TEXTURE.moon);
 
   texture.colorSpace = THREE.SRGBColorSpace;
 

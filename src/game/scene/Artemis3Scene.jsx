@@ -5,7 +5,7 @@ import { TextureLoader } from "three";
 import { useEffect, useMemo, useRef } from "react";
 import { CELESTIAL_RADII, SCENE_COLORS } from "../../constants";
 import { getArtemis3SceneTrails } from "../../data/scenarios/artemis-3/adapter";
-import earthTexture from "../../assets/earth-map.jpg";
+import { TEXTURE } from "../../assets/assetRegistry";
 import orionTexture from "../../assets/orion.png";
 import blueMoonTexture from "../../assets/blue-moon.png";
 import starshipTexture from "../../assets/artemis.png";
@@ -233,7 +233,7 @@ function CameraRig({
 }
 
 function Earth() {
-    const texture = useLoader(TextureLoader, earthTexture);
+    const texture = useLoader(TextureLoader, TEXTURE.earth);
     texture.colorSpace = THREE.SRGBColorSpace;
 
     return (
