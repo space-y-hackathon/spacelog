@@ -119,7 +119,7 @@ function CameraRig({ cameraTarget, currentIndex, rocketPoints, moonPoints }) {
 }
 
 // Lintasan Orion
-function Trajectory({ points }) {
+function Trajectory({ points, label, onHover }) {
   const geometry = useMemo(() => {
     return new THREE.BufferGeometry().setFromPoints(
       points.map((point) => {
@@ -134,7 +134,14 @@ function Trajectory({ points }) {
   }, [geometry]);
 
   return (
-    <line geometry={geometry}>
+    <line
+      geometry={geometry}
+      onPointerOver={(event) => {
+        event.stopPropagation();
+        onHover({ label, color: SCENE_COLORS.ROCKET_TRAJECTORY });
+      }}
+      onPointerOut={() => onHover(null)}
+    >
       <lineBasicMaterial
         color={SCENE_COLORS.ROCKET_TRAJECTORY}
         transparent
@@ -228,6 +235,7 @@ function SceneContent({
   rocketPoints,
   moonPoints,
   cameraTarget,
+  onTrajectoryHover,
 }) {
   return (
     <>
@@ -242,7 +250,11 @@ function SceneContent({
 
       {rocketPoints.length > 0 && (
         <>
-          <Trajectory points={rocketPoints} />
+          <Trajectory
+            points={rocketPoints}
+            label="Spacecraft trajectory"
+            onHover={onTrajectoryHover}
+          />
 
           <Orion
             points={rocketPoints}
@@ -268,10 +280,12 @@ export default function ArtemisScene({
   rocketPoints = [],
   moonPoints = [],
   cameraTarget = "earth",
+  onTrajectoryHover,
 }) {
   return (
     <div className="mission-canvas">
       <Canvas
+        raycaster={{ params: { Line: { threshold: 0.012 } } }}
         camera={{
           position: [0.8, 0, 5],
           fov: 45,
@@ -284,6 +298,7 @@ export default function ArtemisScene({
           rocketPoints={rocketPoints}
           moonPoints={moonPoints}
           cameraTarget={cameraTarget}
+          onTrajectoryHover={onTrajectoryHover}
         />
       </Canvas>
     </div>

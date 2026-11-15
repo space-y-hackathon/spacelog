@@ -101,7 +101,6 @@ export default function MainMenu({ onLaunch }) {
             <div className="brand-icon-box" aria-hidden="true">
               <img src={ LOGO.logo } alt="" />
             </div>
-
             <div className="brand-text">
               <span className="brand-title">DELTA-V</span>
               <span className="brand-subtitle">
@@ -164,7 +163,10 @@ export default function MainMenu({ onLaunch }) {
 
       {/* Modal */}
       {panel && (
-        <Modal onClose={() => setActivePanel(null)}>
+        <Modal
+          onClose={() => setActivePanel(null)}
+          ariaLabel={panel.title}
+        >
           <span className="modal-kicker">
             {panel.kicker}
           </span>
@@ -200,7 +202,6 @@ export default function MainMenu({ onLaunch }) {
                 <strong>{option.title}</strong>
                 <small>{option.description}</small>
               </span>
-
               <b>→</b>
             </button>
           ))}
