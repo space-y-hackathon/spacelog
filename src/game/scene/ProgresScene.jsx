@@ -24,7 +24,11 @@ function formatNumber(value, digits = 2) {
 }
 
 function getArtemisDate(timestamp) {
-  const date = new Date(timestamp);
+  const timestampText = String(timestamp);
+  const normalizedTimestamp = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(timestampText)
+    ? timestampText
+    : `${timestampText}Z`;
+  const date = new Date(normalizedTimestamp);
   if (Number.isNaN(date.getTime())) {
     return {
       Date: "N/A",
@@ -165,6 +169,24 @@ function calculateDistanceToMoon(currentPoint, rocketPoints, moonPoints, index) 
   if (!Number.isFinite(sceneDistMoon)) return null;
   return sceneDistMoon * kmPerSceneUnit;
 }
+
+function formatMissionDuration(startTimestamp, endTimestamp) {
+  if (startTimestamp === null || endTimestamp === null) return "N/A";
+
+  const durationHours = Math.floor(
+    Math.max(0, endTimestamp - startTimestamp) / 3_600_000
+  );
+  const days = Math.floor(durationHours / 24);
+  const hours = durationHours % 24;
+  return `${days} DAYS ${hours} HRS`;
+}
+
+const MISSION_HEADLINES = {
+  "artemis-1":
+    "BREAKING: Orion spacecraft completes uncrewed lunar distant retrograde orbit and Pacific splashdown, clearing the path for crewed Artemis II.",
+  "lunar-2014":
+    "ARCHIVED TELEMETRY: Cislunar trajectory replay complete — orbital mechanics and gravitational slingshot data verified.",
+};
 
 export default function ProgresScene({
   missionId = "lunar-2014",
@@ -500,6 +522,71 @@ export default function ProgresScene({
     (item) => item.value !== "N/A"
   ).length;
 
+  const handleMissionComplete = () => {
+    const firstPoint = coordinates[0];
+    const lastPoint = coordinates[TOTAL_POINTS - 1];
+    let maxVelocity = null;
+    let closestLunarApproach = null;
+    let maxEarthDistance = null;
+
+    coordinates.forEach((point, index) => {
+      const velocity = calculateVelocity(coordinates, index);
+      if (Number.isFinite(velocity)) {
+        maxVelocity = Math.max(maxVelocity ?? velocity, velocity);
+      }
+
+      const lunarDistance = calculateDistanceToMoon(
+        point,
+        rocketPoints,
+        moonPoints,
+        index
+      );
+      if (Number.isFinite(lunarDistance)) {
+        closestLunarApproach = Math.min(
+          closestLunarApproach ?? lunarDistance,
+          lunarDistance
+        );
+      }
+
+      const earthDistance = Math.hypot(
+        Number(point.X),
+        Number(point.Y),
+        Number(point.Z)
+      );
+      if (Number.isFinite(earthDistance)) {
+        maxEarthDistance = Math.max(
+          maxEarthDistance ?? earthDistance,
+          earthDistance
+        );
+      }
+    });
+
+    const startTimestamp = parsePointTimestampMs(firstPoint);
+    const endTimestamp = parsePointTimestampMs(lastPoint);
+
+    onContinue({
+      missionName: missionData.name,
+      displayMissionName: missionData.name.replace(/^ARCHIVED\s*\/\/\s*/, ""),
+      sampleCount: TOTAL_POINTS,
+      completionDate: lastPoint.Date,
+      completionTime: lastPoint.Time,
+      finalPosition: {
+        x: formatNumber(lastPoint.X),
+        y: formatNumber(lastPoint.Y),
+        z: formatNumber(lastPoint.Z),
+      },
+      startDate: firstPoint.Date,
+      endDate: lastPoint.Date,
+      duration: formatMissionDuration(startTimestamp, endTimestamp),
+      maxVelocity: formatNumber(maxVelocity, 2),
+      closestLunarApproach: formatNumber(closestLunarApproach, 0),
+      maxEarthDistance: formatNumber(maxEarthDistance, 0),
+      headline:
+        MISSION_HEADLINES[missionId] ??
+        `${missionData.name} trajectory replay complete.`,
+    });
+  };
+
   return (
     <main
       className={`progress-scene ${showBottom ? "" : "bottom-hidden"
@@ -536,19 +623,7 @@ export default function ProgresScene({
             <Button
               variant="primary"
               className="mission-success-action"
-              onClick={() =>
-                onContinue({
-                  missionName: missionData.name,
-                  sampleCount: TOTAL_POINTS,
-                  completionDate: currentPoint.Date,
-                  completionTime: currentPoint.Time,
-                  finalPosition: {
-                    x: formatNumber(currentPoint.X),
-                    y: formatNumber(currentPoint.Y),
-                    z: formatNumber(currentPoint.Z),
-                  },
-                })
-              }
+              onClick={handleMissionComplete}
             >
               Continue
             </Button>
