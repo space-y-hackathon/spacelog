@@ -1,10 +1,17 @@
+import audioManager from "../audioManager";
+import { SFX } from "../assets/audioRegistry";
+
 export default function RocketShowcase({ vehicles, activeIndex, onSelect }) {
-  const current = vehicles[activeIndex] || vehicles[0]
+  const current = vehicles[activeIndex] || vehicles[0];
 
   const handleCycle = () => {
-    const nextIndex = (activeIndex + 1) % vehicles.length
-    onSelect(nextIndex)
-  }
+    const nextIndex = (activeIndex + 1) % vehicles.length;
+    onSelect(nextIndex);
+  };
+
+  const playButtonClick = () => {
+    audioManager.playSFX(SFX.buttonClick);
+  };
 
   return (
     <div className="rocket-showcase">
@@ -26,7 +33,10 @@ export default function RocketShowcase({ vehicles, activeIndex, onSelect }) {
       <button
         type="button"
         className="rocket-indicator"
-        onClick={handleCycle}
+        onClick={() => {
+          playButtonClick();
+          handleCycle();
+        }}
         title="Switch spacecraft preview"
       >
         <span className="indicator-dot" />
@@ -34,5 +44,5 @@ export default function RocketShowcase({ vehicles, activeIndex, onSelect }) {
         <span className="indicator-name">{current.name}</span>
       </button>
     </div>
-  )
+  );
 }

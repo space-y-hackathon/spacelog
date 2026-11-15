@@ -644,3 +644,83 @@
     width: 100%;
   }
 }
+
+.audio-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 28px;
+}
+
+.audio-setting-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.audio-setting-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #dce8f5;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.audio-setting-heading span {
+  color: #67d4f6;
+  font-weight: 700;
+}
+
+.audio-setting-item input[type="range"] {
+  width: 100%;
+  accent-color: #67d4f6;
+  cursor: pointer;
+}
+
+.audio-setting-mute {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 18px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.audio-setting-mute div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.audio-setting-mute strong {
+  color: #dce8f5;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.audio-setting-mute small {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.audio-mute-button {
+  min-width: 76px;
+  padding: 9px 15px;
+  color: #67d4f6;
+  background: rgba(103, 212, 246, 0.1);
+  border: 1px solid rgba(103, 212, 246, 0.4);
+  border-radius: 7px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.audio-mute-button:hover {
+  background: rgba(103, 212, 246, 0.2);
+}
+
+.audio-mute-button.muted {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+  border-color: rgba(248, 113, 113, 0.4);
+}

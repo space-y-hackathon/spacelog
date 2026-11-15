@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { LOGO } from "../assets/assetRegistry";
-import {PANEL_CONTENT, SHOWCASE_VEHICLES} from "../constants";
+import { PANEL_CONTENT, SHOWCASE_VEHICLES } from "../constants";
 
 import Button from "../components/Button";
 import Modal from "../components/Modal";
 import RocketShowcase from "../components/RocketShowcase";
 import Starfield from "../components/Starfield";
+import audioManager from "../audioManager";
+import { BGM, SFX } from "../assets/audioRegistry";
 
 import "./MainMenu.css";
 
@@ -14,9 +16,23 @@ export default function MainMenu({ onLaunch }) {
   const [activePanel, setActivePanel] = useState(null);
   const [typedDescription, setTypedDescription] = useState("");
 
-  const panel = activePanel
-    ? PANEL_CONTENT[activePanel]
-    : null;
+  const [bgmVolume, setBgmVolume] = useState(audioManager.bgmVolume);
+  const [sfxVolume, setSfxVolume] = useState(audioManager.sfxVolume);
+  const [isMuted, setIsMuted] = useState(audioManager.muted);
+
+  const panel = activePanel ? PANEL_CONTENT[activePanel] : null;
+
+  const playButtonClick = () => {
+    audioManager.playSFX(SFX.buttonClick);
+  };
+
+  const playButtonHover = () => {
+    audioManager.playSFX(SFX.buttonHover);
+  };
+
+  useEffect(() => {
+    audioManager.preloadSFX(Object.values(SFX));
+  }, []);
 
   // Escape untuk menutup modal
   useEffect(() => {
@@ -34,6 +50,15 @@ export default function MainMenu({ onLaunch }) {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [activePanel]);
+
+  useEffect(() => {
+    audioManager.preloadSFX(Object.values(SFX));
+    audioManager.playBGM(BGM.mainMenu);
+
+    return () => {
+      audioManager.stopBGM();
+    };
+  }, []);
 
   // Tutorial typing animation
   useEffect(() => {
@@ -66,10 +91,7 @@ export default function MainMenu({ onLaunch }) {
 
     const missionId = activePanel.replace("launch_", "");
 
-    const availableMissions = [
-      "artemis_1",
-      "lunar_2014",
-    ];
+    const availableMissions = ["artemis_1", "lunar_2014"];
 
     if (!availableMissions.includes(missionId)) {
       console.warn("Mission belum tersedia:", missionId);
@@ -83,6 +105,27 @@ export default function MainMenu({ onLaunch }) {
     } else {
       console.error("onLaunch belum diteruskan dari App.jsx");
     }
+  };
+
+  const handleBgmVolume = (value) => {
+    const volume = Number(value);
+
+    setBgmVolume(volume);
+    audioManager.setBGMVolume(volume);
+  };
+
+  const handleSfxVolume = (value) => {
+    const volume = Number(value);
+
+    setSfxVolume(volume);
+    audioManager.setSFXVolume(volume);
+  };
+
+  const handleMute = () => {
+    const nextMuted = !isMuted;
+
+    setIsMuted(nextMuted);
+    audioManager.setMute(nextMuted);
   };
 
   return (
@@ -99,14 +142,12 @@ export default function MainMenu({ onLaunch }) {
         <section className="menu-left" aria-label="Main Menu">
           <div className="brand-card">
             <div className="brand-icon-box" aria-hidden="true">
-              <img src={ LOGO.logo } alt="" />
+              <img src={LOGO.logo} alt="" />
             </div>
 
             <div className="brand-text">
               <span className="brand-title">DELTA-V</span>
-              <span className="brand-subtitle">
-                SPACE MISSION SANDBOX
-              </span>
+              <span className="brand-subtitle">SPACE MISSION SANDBOX</span>
             </div>
           </div>
 
@@ -114,29 +155,21 @@ export default function MainMenu({ onLaunch }) {
             <h1 className="menu-title">SPACELOG</h1>
 
             <div className="menu-eyebrow">
-              <span
-                className="eyebrow-dot"
-                aria-hidden="true"
-              />
+              <span className="eyebrow-dot" aria-hidden="true" />
               <span>YOUR NEXT FRONTIER AWAITS</span>
             </div>
 
             <p className="menu-description">
-              Design your spacecraft, master the physics of
-              spaceflight, and write your own mission history.
+              Design your spacecraft, master the physics of spaceflight, and
+              write your own mission history.
             </p>
 
             <div className="menu-actions-grid">
-              <Button
-                variant="primary"
-                onClick={() => setActivePanel("play")}
-              >
+              <Button variant="primary" onClick={() => setActivePanel("play")}>
                 PLAY
               </Button>
 
-              <Button
-                onClick={() => setActivePanel("tutorial")}
-              >
+              <Button onClick={() => setActivePanel("tutorial")}>
                 TUTORIAL
               </Button>
 
@@ -150,10 +183,7 @@ export default function MainMenu({ onLaunch }) {
           </div>
         </section>
 
-        <section
-          className="menu-right"
-          aria-label="Spacecraft Preview"
-        >
+        <section className="menu-right" aria-label="Spacecraft Preview">
           <RocketShowcase
             vehicles={SHOWCASE_VEHICLES}
             activeIndex={activeVehicle}
@@ -165,22 +195,15 @@ export default function MainMenu({ onLaunch }) {
       {/* Modal */}
       {panel && (
         <Modal onClose={() => setActivePanel(null)}>
-          <span className="modal-kicker">
-            {panel.kicker}
-          </span>
+          <span className="modal-kicker">{panel.kicker}</span>
 
           <h2>{panel.title}</h2>
 
           {activePanel === "tutorial" ? (
             <p>
-              <span className="visually-hidden">
-                {panel.description}
-              </span>
+              <span className="visually-hidden">{panel.description}</span>
 
-              <span
-                className="tutorial-typed-text"
-                aria-hidden="true"
-              >
+              <span className="tutorial-typed-text" aria-hidden="true">
                 {typedDescription}
               </span>
             </p>
@@ -188,35 +211,97 @@ export default function MainMenu({ onLaunch }) {
             <p>{panel.description}</p>
           )}
 
-          {/* Pilihan panel */}
-          {panel.options?.map((option) => (
-            <button
-              key={option.title}
-              type="button"
-              className="modal-option"
-              onClick={() => setActivePanel(option.nextPanel)}
-            >
-              <span>
-                <strong>{option.title}</strong>
-                <small>{option.description}</small>
-              </span>
+          {activePanel === "settings" && (
+            <div className="audio-settings">
+              <div className="audio-setting-item">
+                <div className="audio-setting-heading">
+                  <strong>BACKGROUND MUSIC</strong>
+                  <span>{Math.round(bgmVolume * 100)}%</span>
+                </div>
 
-              <b>→</b>
-            </button>
-          ))}
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={bgmVolume}
+                  onChange={(event) => handleBgmVolume(event.target.value)}
+                />
+              </div>
+
+              <div className="audio-setting-item">
+                <div className="audio-setting-heading">
+                  <strong>SOUND EFFECTS</strong>
+                  <span>{Math.round(sfxVolume * 100)}%</span>
+                </div>
+
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={sfxVolume}
+                  onChange={(event) => handleSfxVolume(event.target.value)}
+                />
+              </div>
+
+              <div className="audio-setting-mute">
+                <div>
+                  <strong>MASTER AUDIO</strong>
+                  <small>Mute all background music and effects</small>
+                </div>
+
+                <button
+                  type="button"
+                  className={`audio-mute-button ${isMuted ? "muted" : ""}`}
+                  onClick={() => {
+                    playButtonClick();
+                    handleMute();
+                  }}
+                  onMouseEnter={playButtonHover}
+                >
+                  {isMuted ? "MUTED" : "ON"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Pilihan panel */}
+          {activePanel !== "settings" &&
+            panel.options?.map((option) => (
+              <button
+                key={option.title}
+                type="button"
+                className="modal-option"
+                onClick={() => {
+                  playButtonClick();
+                  setActivePanel(option.nextPanel);
+                }}
+                onMouseEnter={playButtonHover}
+              >
+                <span>
+                  <strong>{option.title}</strong>
+                  <small>{option.description}</small>
+                </span>
+
+                <b>→</b>
+              </button>
+            ))}
 
           {/* Tombol Launch */}
           {activePanel.startsWith("launch_") && (
             <button
               type="button"
               className="modal-option"
-              onClick={handleLaunch}
+              onClick={() => {
+                playButtonClick();
+                handleLaunch();
+              }}
+              onMouseEnter={playButtonHover}
             >
               <span>
                 <strong>LAUNCH MISSION</strong>
-                <small>
-                  Initialize mission visualization.
-                </small>
+                <small>Initialize mission visualization.</small>
               </span>
 
               <b>→</b>
@@ -228,7 +313,11 @@ export default function MainMenu({ onLaunch }) {
             <button
               type="button"
               className="modal-back"
-              onClick={() => setActivePanel(panel.backPanel)}
+              onClick={() => {
+                playButtonClick();
+                setActivePanel(panel.backPanel);
+              }}
+              onMouseEnter={playButtonHover}
             >
               ← BACK
             </button>
