@@ -10,14 +10,18 @@ function getPartCategory(path) {
   const value = path.toLowerCase();
 
   if (value.includes("launch escape system")) return "escape-system";
-  if (value.includes("aerodynamic cone")) return "aerodynamic-cone";
+  if (value.includes("aerodynamic cone")) return "cone-small";
+  if (value.includes("cone small")) return "cone-small";
   if (value.includes("crew capsule")) return "capsule";
-  if (value.includes("orion service module")) return "service-module";
-  if (value.includes("solar panel")) return "solar-panel";
-  if (value.includes("rcs")) return "rcs";
+  if (value.includes("service module")) return "service-module";
+  if (value.includes("rcs left")) return "left-rcs";
+  if (value.includes("rcs right")) return "right-rcs";
   if (value.includes("booster")) return "booster";
+  if (value.includes("core engine")) return "core-engine";
   if (value.includes("engine")) return "engine";
+  if (value.includes("big cone separator")) return "big-cone-separator";
   if (value.includes("separator")) return "separator";
+  if (value.includes("core stage 3")) return "core-stage-3";
 
   if (
     value.includes("fuel tank") ||

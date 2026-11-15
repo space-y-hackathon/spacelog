@@ -47,15 +47,17 @@ export default function Canvas({
               disabled={selectedCategory !== zone.category}
               onClick={() => onSelectZone(zone)}
               className={`blueprint-zone ${occupied ? "occupied" : ""} ${selectedCategory === zone.category ? "available" : ""}`}
+              data-zone-id={zone.id}
               style={{
                 left: `${zone.x}%`,
                 top: `${zone.y}%`,
                 width: `${zone.width}%`,
                 height: `${zone.height}%`,
               }}
+              aria-label={`${zone.label}${zone.required ? ", required" : ""}`}
               title={`${zone.label}${zone.required ? " (required)" : ""}`}
             >
-              <span>{zone.label}{zone.required ? " *" : ""}</span>
+              <span aria-hidden="true">{zone.placeholderLabel}</span>
             </button>
           );
         })}
