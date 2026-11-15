@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Canvas } from "@react-three/fiber";
 
+import Button from "../../components/Button";
 import LaunchTower from "../../components/LaunchTower";
 // import Rocket from '../../components/Rocket';
 
@@ -127,13 +128,13 @@ export default function LaunchScene({ missionId, onLaunch, onBack }) {
 
       {/* Launch Actions */}
       <div className="launch-actions">
-        <button className="launch-button" onClick={onLaunch} type="button">
+        <Button variant="launch" onClick={onLaunch}>
           Launch
-        </button>
+        </Button>
 
-        <button className="reset-button" onClick={handleReset} type="button">
+        <Button variant="reset" onClick={handleReset}>
           Reset
-        </button>
+        </Button>
       </div>
 
       {/* Rocket Inventory */}
