@@ -38,11 +38,6 @@ export const PANEL_CONTENT = {
         description: 'Reconstruct Artemis I, Artemis II, and future Artemis III trajectories.',
         nextPanel: 'scenario',
       },
-      {
-        title: 'NEW SANDBOX',
-        description: 'Build and experiment with orbital maneuvers without a fixed objective.',
-        nextPanel: 'sandbox',
-      },
     ],
   },
   scenario: {
