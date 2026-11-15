@@ -65,6 +65,11 @@ export const PANEL_CONTENT = {
         description: 'NRHO rendezvous and lunar south pole descent profile.',
         nextPanel: 'launch_artemis_3',
       },
+      {
+        title: "ARCHIVED // LUNAR 2014",
+        description: "Explore historical lunar trajectory and orbital coordinate datasets from 2014.",
+        nextPanel: "launch_lunar_2014",
+      },
     ],
     backPanel: 'play',
   },
@@ -103,4 +108,31 @@ export const PANEL_CONTENT = {
     description: 'Ready to load Artemis III lunar landing profile into the 3D mission scene.',
     backPanel: 'scenario',
   },
+  launch_lunar_2014: {
+    kicker: "ARCHIVED // LUNAR 2014",
+    title: "Mission Ready",
+    description: "Ready to load historical lunar trajectory and orbital data.",
+    backPanel: "scenario",
+  },
 }
+
+// --- KONSTANTA SIMULASI & SCENE 3D ---
+
+export const PLAYBACK_INTERVAL = 100; // interval animasi di ProgresScene.jsx
+
+export const SCENE_SCALE = 0.000006;
+
+export const CELESTIAL_RADII = {
+  EARTH: 6371 * SCENE_SCALE, // dipakai di ArtemisScene, LunarScene, & lunar/adapter
+  MOON: 1737.4 * SCENE_SCALE, // dipakai di LunarScene
+};
+
+export const MISSION_SCALES = {
+  LUNAR_2014: SCENE_SCALE, // skala koordinat di data/scenarios/lunar/adapter.js
+};
+
+export const SCENE_COLORS = {
+  ROCKET_TRAJECTORY: "#ff8c42",
+  MOON_TRAJECTORY: "#a0a0a0",
+  FINISH_MARKER: "#22c55e",
+};
