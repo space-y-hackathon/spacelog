@@ -167,7 +167,10 @@ export default function MainMenu({ onLaunch }) {
 
       {/* Modal */}
       {panel && (
-        <Modal onClose={() => setActivePanel(null)}>
+        <Modal
+          onClose={() => setActivePanel(null)}
+          ariaLabel={panel.title}
+        >
           <span className="modal-kicker">
             {panel.kicker}
           </span>

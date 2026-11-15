@@ -85,23 +85,6 @@
   gap: 20px;
 }
 
-.launch-button,
-.reset-button {
-  padding: 12px 25px;
-  font-size: 25px;
-  font-weight: bold;
-  border-radius: 12px;
-  color: white;
-}
-
-.launch-button {
-  background: #079b12;
-}
-
-.reset-button {
-  background: #a52d2d;
-}
-
 .launch-inventory {
   bottom: 4%;
   left: 3%;

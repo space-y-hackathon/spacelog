@@ -7,6 +7,7 @@ export default function MissionScene({
   moonPoints = [],
   rocketPoints = [],
   cameraTarget = "earth",
+  onTrajectoryHover,
 }) {
   if (missionId === "artemis-1") {
     return (
@@ -15,6 +16,7 @@ export default function MissionScene({
         moonPoints={moonPoints}
         rocketPoints={rocketPoints}
         cameraTarget={cameraTarget}
+        onTrajectoryHover={onTrajectoryHover}
       />
     );
   }
@@ -25,6 +27,7 @@ export default function MissionScene({
       moonPoints={moonPoints}
       rocketPoints={rocketPoints}
       cameraTarget={cameraTarget}
+      onTrajectoryHover={onTrajectoryHover}
     />
   );
 }

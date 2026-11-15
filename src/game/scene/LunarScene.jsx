@@ -115,7 +115,7 @@ function CameraRig({ cameraTarget, currentIndex, rocketPoints, moonPoints }) {
 }
 
 // Membuat garis lintasan
-function Trajectory({ points, color }) {
+function Trajectory({ points, color, label, onHover }) {
   const geometry = useMemo(() => {
     return new THREE.BufferGeometry().setFromPoints(
       points.map(([x, y, z]) => new THREE.Vector3(x, z, -y))
@@ -127,7 +127,14 @@ function Trajectory({ points, color }) {
   }, [geometry]);
 
   return (
-    <line geometry={geometry}>
+    <line
+      geometry={geometry}
+      onPointerOver={(event) => {
+        event.stopPropagation();
+        onHover({ label, color });
+      }}
+      onPointerOut={() => onHover(null)}
+    >
       <lineBasicMaterial color={color} transparent opacity={0.8} />
     </line>
   );
@@ -237,6 +244,7 @@ function SceneContent({
   moonPoints,
   rocketPoints,
   cameraTarget,
+  onTrajectoryHover,
 }) {
   return (
     <>
@@ -259,6 +267,8 @@ function SceneContent({
           <Trajectory
             points={moonPoints}
             color={SCENE_COLORS.MOON_TRAJECTORY}
+            label="Moon orbital path"
+            onHover={onTrajectoryHover}
           />
         </>
       )}
@@ -275,6 +285,8 @@ function SceneContent({
           <Trajectory
             points={rocketPoints}
             color={SCENE_COLORS.ROCKET_TRAJECTORY}
+            label="Spacecraft trajectory"
+            onHover={onTrajectoryHover}
           />
         </>
       )}
@@ -295,10 +307,12 @@ export default function LunarScene({
   moonPoints = [],
   rocketPoints = [],
   cameraTarget = "earth",
+  onTrajectoryHover,
 }) {
   return (
     <div className="mission-canvas">
       <Canvas
+        raycaster={{ params: { Line: { threshold: 0.012 } } }}
         camera={{
           position: [0.8, 0, 5],
           fov: 45,
@@ -311,6 +325,7 @@ export default function LunarScene({
           moonPoints={moonPoints}
           rocketPoints={rocketPoints}
           cameraTarget={cameraTarget}
+          onTrajectoryHover={onTrajectoryHover}
         />
       </Canvas>
     </div>
