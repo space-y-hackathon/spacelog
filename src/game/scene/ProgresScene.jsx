@@ -15,6 +15,8 @@ import {
   ARTEMIS3_PHASES,
   getArtemis3HudData,
 } from "../../data/scenarios/artemis-3/adapter.js";
+import audioManager from "../../audioManager";
+import { BGM } from "../../assets/audioRegistry";
 
 const SPEED_OPTIONS = [1, 2, 4, 10, 25];
 const EARTH_MU_KM3_S2 = 398600.4418; // Parameter gravitasi standar Bumi (km³/s²)
@@ -112,7 +114,7 @@ function calculateVelocity(coordinates, index) {
     return Math.hypot(
       Number(current.velocity.x),
       Number(current.velocity.y),
-      Number(current.velocity.z)
+      Number(current.velocity.z),
     );
   }
 
@@ -141,7 +143,12 @@ function calculateVelocity(coordinates, index) {
 }
 
 // Hitung jarak roket ke target (Bulan atau wahana lain) dalam km dari koordinat scene
-function calculateDistanceToMoon(currentPoint, rocketPoints, targetPoints, index) {
+function calculateDistanceToMoon(
+  currentPoint,
+  rocketPoints,
+  targetPoints,
+  index,
+) {
   if (
     !currentPoint ||
     !rocketPoints ||
@@ -162,12 +169,12 @@ function calculateDistanceToMoon(currentPoint, rocketPoints, targetPoints, index
   const rawDistEarth = Math.hypot(
     Number(currentPoint.X),
     Number(currentPoint.Y),
-    Number(currentPoint.Z)
+    Number(currentPoint.Z),
   );
   const sceneDistEarth = Math.hypot(
     Number(rocketScene[0]),
     Number(rocketScene[1]),
-    Number(rocketScene[2])
+    Number(rocketScene[2]),
   );
 
   if (
@@ -182,7 +189,7 @@ function calculateDistanceToMoon(currentPoint, rocketPoints, targetPoints, index
   const sceneDistTarget = Math.hypot(
     Number(rocketScene[0]) - Number(targetScene[0]),
     Number(rocketScene[1]) - Number(targetScene[1]),
-    Number(rocketScene[2]) - Number(targetScene[2])
+    Number(rocketScene[2]) - Number(targetScene[2]),
   );
 
   if (!Number.isFinite(sceneDistTarget)) return null;
@@ -193,7 +200,7 @@ function formatMissionDuration(startTimestamp, endTimestamp) {
   if (startTimestamp === null || endTimestamp === null) return "N/A";
 
   const durationHours = Math.floor(
-    Math.max(0, endTimestamp - startTimestamp) / 3_600_000
+    Math.max(0, endTimestamp - startTimestamp) / 3_600_000,
   );
   const days = Math.floor(durationHours / 24);
   const hours = durationHours % 24;
@@ -317,7 +324,9 @@ export default function ProgresScene({
     return options;
   }, [rocketPoints.length, moonPoints.length, missionId]);
 
-  const activeCameraTarget = cameraOptions.some((opt) => opt.id === cameraTarget)
+  const activeCameraTarget = cameraOptions.some(
+    (opt) => opt.id === cameraTarget,
+  )
     ? cameraTarget
     : "earth";
 
@@ -326,7 +335,7 @@ export default function ProgresScene({
   // Batasi index agar tidak melewati jumlah data
   const safeIndex = Math.min(
     Math.max(currentIndex, 0),
-    Math.max(TOTAL_POINTS - 1, 0)
+    Math.max(TOTAL_POINTS - 1, 0),
   );
 
   const currentPoint = coordinates[safeIndex] ?? null;
@@ -351,6 +360,14 @@ export default function ProgresScene({
     setCameraTarget("earth");
     setIsPlaying(true);
   }, [missionId]);
+
+  useEffect(() => {
+    audioManager.playBGM(BGM.mainMenu);
+
+    return () => {
+      audioManager.stopBGM();
+    };
+  }, []);
 
   // Safety net global: lepas scrubbing jika mouse dilepas atau window kehilangan fokus
   useEffect(() => {
@@ -393,7 +410,8 @@ export default function ProgresScene({
   // Shortcut keyboard (Spasi = Play/Pause, Panah Kiri/Kanan = Step, C = Ganti Kamera)
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")
+        return;
 
       if (e.code === "Space") {
         e.preventDefault();
@@ -402,7 +420,7 @@ export default function ProgresScene({
         e.preventDefault();
         const step = e.shiftKey ? 1 : 50;
         setCurrentIndex((prev) =>
-          Math.min(prev + step, Math.max(TOTAL_POINTS - 1, 0))
+          Math.min(prev + step, Math.max(TOTAL_POINTS - 1, 0)),
         );
       } else if (e.code === "ArrowLeft") {
         e.preventDefault();
@@ -534,7 +552,7 @@ export default function ProgresScene({
     currentPoint,
     rocketPoints,
     moonPoints,
-    safeIndex
+    safeIndex,
   );
 
   // Hitung jarak target rendezvous khusus Artemis III (Orion -> Starship HLS / Blue Moon)
@@ -546,14 +564,14 @@ export default function ProgresScene({
   const artemis3TargetRangeKm = isArtemis3
     ? currentPoint?.dockedTo
       ? 0
-      : calculateDistanceToMoon(
+      : (calculateDistanceToMoon(
           currentPoint,
           rocketPoints,
           artemis3TargetPoints,
-          safeIndex
+          safeIndex,
         ) ??
         artemis3Hud?.targetRangeKm ??
-        null
+        null)
     : null;
 
   const thirdMetricCard = isArtemis3
@@ -594,7 +612,7 @@ export default function ProgresScene({
   ];
 
   const activeSystemCount = systemParameters.filter(
-    (item) => item.value !== "N/A"
+    (item) => item.value !== "N/A",
   ).length;
 
   const handleMissionComplete = () => {
@@ -616,24 +634,24 @@ export default function ProgresScene({
         point,
         rocketPoints,
         moonPoints,
-        index
+        index,
       );
       if (Number.isFinite(lunarDistance)) {
         closestLunarApproach = Math.min(
           closestLunarApproach ?? lunarDistance,
-          lunarDistance
+          lunarDistance,
         );
       }
 
       const earthDistance = Math.hypot(
         Number(point.X),
         Number(point.Y),
-        Number(point.Z)
+        Number(point.Z),
       );
       if (Number.isFinite(earthDistance)) {
         maxEarthDistance = Math.max(
           maxEarthDistance ?? earthDistance,
-          earthDistance
+          earthDistance,
         );
       }
     });
@@ -870,7 +888,11 @@ export default function ProgresScene({
               title="Kecepatan Timelapse (1x / 2x / 4x / 10x / 25x)"
               style={
                 speed > 1
-                  ? { borderColor: "#22c55e", color: "#22c55e", minWidth: "46px" }
+                  ? {
+                      borderColor: "#22c55e",
+                      color: "#22c55e",
+                      minWidth: "46px",
+                    }
                   : { minWidth: "46px" }
               }
             >
@@ -881,9 +903,7 @@ export default function ProgresScene({
       </section>
 
       {/* Left: Rocket Telemetry */}
-      <section
-        className={`rocket-statistics ${showLeft ? "" : "hidden-left"}`}
-      >
+      <section className={`rocket-statistics ${showLeft ? "" : "hidden-left"}`}>
         <div className="statistics-heading">
           <div>
             <span className="statistics-kicker">LIVE TELEMETRY</span>
@@ -891,9 +911,7 @@ export default function ProgresScene({
             <h3>Rocket Statistics</h3>
           </div>
 
-          <span
-            className={`live-indicator ${isPlaying ? "active" : "paused"}`}
-          >
+          <span className={`live-indicator ${isPlaying ? "active" : "paused"}`}>
             ● {isPlaying ? (direction === -1 ? "REWIND" : "LIVE") : "PAUSED"}
           </span>
         </div>
@@ -950,9 +968,7 @@ export default function ProgresScene({
       <button
         className={`panel-toggle toggle-left ${showLeft ? "open" : "closed"}`}
         onClick={() => setShowLeft((value) => !value)}
-        aria-label={
-          showLeft ? "Sembunyikan telemetry" : "Tampilkan telemetry"
-        }
+        aria-label={showLeft ? "Sembunyikan telemetry" : "Tampilkan telemetry"}
       >
         {showLeft ? "◀" : "▶"}
       </button>
