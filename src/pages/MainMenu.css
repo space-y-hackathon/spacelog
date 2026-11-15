@@ -737,30 +737,23 @@
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  max-height: 240px;
-  background: rgba(10, 16, 30, 0.75);
+  max-height: 260px;
+  background: rgba(5, 10, 20, 0.9);
   border: 1px solid rgba(120, 180, 255, 0.25);
   border-radius: 10px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.8);
 }
 
 .tutorial-media-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  text-align: center;
-  color: rgba(180, 210, 255, 0.75);
-  font-size: 0.85rem;
-  letter-spacing: 0.04em;
-  line-height: 1.5;
+  object-fit: contain;
+  padding: 0.5rem;
+  display: block;
 }
 
 .tutorial-text-box {
