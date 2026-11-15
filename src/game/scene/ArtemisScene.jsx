@@ -1,14 +1,55 @@
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { TextureLoader } from "three";
 import { useEffect, useMemo, useRef } from "react";
 import { CELESTIAL_RADII, SCENE_COLORS } from "../../constants";
+import artemisTexture from "../../assets/artemis.png";
 import { TEXTURE } from "../../assets/assetRegistry";
 
 // Konversi koordinat EME2000 ke basis Three.js
 function toThreePosition([x, y, z]) {
   return [x, z, -y];
+}
+
+// Wahana Orion
+function Orion({ points, currentIndex }) {
+  const texture = useTexture(artemisTexture);
+
+  useEffect(() => {
+    if (texture) {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.needsUpdate = true;
+    }
+  }, [texture]);
+
+  if (!points || points.length === 0) return null;
+  const index = Math.min(currentIndex, points.length - 1);
+  const position = toThreePosition(points[index]);
+
+  const aspect =
+    texture.image && texture.image.height
+      ? texture.image.width / texture.image.height
+      : 1;
+  const spriteHeight = 0.028;
+
+  return (
+    <group position={position}>
+      <sprite scale={[spriteHeight * aspect, spriteHeight, 1]}>
+        <spriteMaterial
+          map={texture}
+          transparent
+          toneMapped={false}
+          depthWrite={false}
+        />
+      </sprite>
+      <pointLight
+        color={SCENE_COLORS.ROCKET_TRAJECTORY}
+        intensity={1}
+        distance={0.2}
+      />
+    </group>
+  );
 }
 
 function getTargetVector(cameraTarget, currentIndex, rocketPoints, moonPoints) {
@@ -174,38 +215,6 @@ function Earth() {
         roughness={1}
       />
     </mesh>
-  );
-}
-
-// Wahana Orion
-function Orion({ points, currentIndex }) {
-  if (!points || points.length === 0) return null;
-
-  const index = Math.min(
-    currentIndex,
-    points.length - 1
-  );
-
-  const position = toThreePosition(points[index]);
-
-  return (
-    <group position={position}>
-      <mesh>
-        <boxGeometry args={[0.008, 0.008, 0.02]} />
-
-        <meshStandardMaterial
-          color={SCENE_COLORS.ROCKET_TRAJECTORY}
-          emissive="#7a3510"
-          emissiveIntensity={0.5}
-        />
-      </mesh>
-
-      <pointLight
-        color={SCENE_COLORS.ROCKET_TRAJECTORY}
-        intensity={1}
-        distance={0.2}
-      />
-    </group>
   );
 }
 

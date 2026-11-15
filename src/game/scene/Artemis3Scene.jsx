@@ -1,11 +1,14 @@
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { TextureLoader } from "three";
 import { useEffect, useMemo, useRef } from "react";
 import { CELESTIAL_RADII, SCENE_COLORS } from "../../constants";
 import { getArtemis3SceneTrails } from "../../data/scenarios/artemis-3/adapter";
 import { TEXTURE } from "../../assets/assetRegistry";
+import orionTexture from "../../assets/orion.png";
+import blueMoonTexture from "../../assets/blue-moon.png";
+import starshipTexture from "../../assets/artemis.png";
 
 const VEHICLE_COLORS = {
   orion: SCENE_COLORS.ROCKET_TRAJECTORY, // Oranye (#ff8c42)
@@ -279,11 +282,40 @@ function TrailLine({ points, color, label, opacity = 0.85, onHover }) {
   );
 }
 
+function VehicleSprite({ textureUrl, scale }) {
+  const texture = useTexture(textureUrl);
+
+  useEffect(() => {
+    if (texture) {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.needsUpdate = true;
+    }
+  }, [texture]);
+
+  const aspect =
+    texture.image && texture.image.height
+      ? texture.image.width / texture.image.height
+      : 1;
+
+  return (
+    <sprite scale={[scale * aspect, scale, 1]}>
+      <spriteMaterial
+        map={texture}
+        transparent
+        toneMapped={false}
+        depthWrite={false}
+      />
+    </sprite>
+  );
+}
+
 function SpacecraftMarker({
   threePosition,
   quaternion,
   color,
   size = [0.0009, 0.0009, 0.0022],
+  textureUrl = null,
+  spriteScale = 0.0055,
   isDocked = false,
   label,
   onHover,
@@ -308,18 +340,22 @@ function SpacecraftMarker({
       onPointerMove={handlePointerMove}
       onPointerOut={() => onHover?.(null)}
     >
-      <mesh>
-        <boxGeometry args={size} />
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={0.65}
-        />
-      </mesh>
+      {textureUrl ? (
+        <VehicleSprite textureUrl={textureUrl} scale={spriteScale} />
+      ) : (
+        <mesh>
+          <boxGeometry args={size} />
+          <meshStandardMaterial
+            color={color}
+            emissive={color}
+            emissiveIntensity={0.65}
+          />
+        </mesh>
+      )}
 
       {isDocked && (
         <mesh>
-          <sphereGeometry args={[size[2] * 0.7, 16, 16]} />
+          <sphereGeometry args={[size[2] * 0.9, 16, 16]} />
           <meshBasicMaterial
             color={VEHICLE_COLORS.dockedRing}
             wireframe
@@ -329,7 +365,7 @@ function SpacecraftMarker({
         </mesh>
       )}
 
-      <pointLight color={color} intensity={0.4} distance={0.03} />
+      <pointLight color={color} intensity={0.35} distance={0.03} />
     </group>
   );
 }
@@ -418,6 +454,8 @@ function SceneContent({
         quaternion={orionQuat}
         color={VEHICLE_COLORS.orion}
         size={VEHICLE_SIZES.orion}
+        textureUrl={orionTexture}
+        spriteScale={0.0055}
         isDocked={Boolean(dockedTo)}
         label="Orion Capsule"
         onHover={onTrajectoryHover}
@@ -428,6 +466,8 @@ function SceneContent({
         quaternion={starshipQuat}
         color={VEHICLE_COLORS.starship}
         size={VEHICLE_SIZES.starship}
+        textureUrl={starshipTexture}
+        spriteScale={0.007}
         isDocked={dockedTo === "starship"}
         label="SpaceX Starship HLS"
         onHover={onTrajectoryHover}
@@ -438,6 +478,8 @@ function SceneContent({
         quaternion={blueMoonQuat}
         color={VEHICLE_COLORS.bluemoon}
         size={VEHICLE_SIZES.bluemoon}
+        textureUrl={blueMoonTexture}
+        spriteScale={0.006}
         isDocked={dockedTo === "bluemoon"}
         label="Blue Origin Blue Moon"
         onHover={onTrajectoryHover}
