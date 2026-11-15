@@ -162,6 +162,12 @@
   box-shadow: inset 0 0 12px rgba(103, 212, 246, 0.18);
 }
 
+.brand-icon-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .brand-text {
   display: flex;
   flex-direction: column;
