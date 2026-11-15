@@ -16,4 +16,31 @@ export const TEXTURE = {
   moon,
 }
 
-export const ROCKET_PARTS = {};
+const rocketImages = import.meta.glob(
+  "./rocket/**/*.{png,PNG}",
+  {
+    eager: true,
+    query: "?url",
+    import: "default",
+  }
+);
+
+export const ROCKET_PARTS = Object.fromEntries(
+  Object.entries(rocketImages)
+    .filter(([path]) => !path.toLowerCase().includes("mockup"))
+    .map(([path, asset]) => {
+      const filename = path.split("/").pop();
+
+      const name = filename
+        .replace(/\.[^/.]+$/, "")
+        .replace(/[-_]/g, " ");
+
+      return [
+        path,
+        {
+          name,
+          asset,
+        },
+      ];
+    })
+);

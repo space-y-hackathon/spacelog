@@ -4,6 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import LaunchTower from "../../components/LaunchTower";
 // import Rocket from '../../components/Rocket';
 
+import { MISSION_DATA } from "../../constants";
 import { ROCKET_PARTS } from "../../assets/assetRegistry";
 
 import "./LaunchScene.css";
@@ -31,14 +32,20 @@ export default function LaunchScene({ missionId, onLaunch, onBack }) {
     setSelectedPart(null);
   };
 
+  const mission = MISSION_DATA[missionId] ?? {
+    title: "UNKNOWN MISSION",
+    brief: "Mission briefing is currently unavailable.",
+    objectives: [],
+  };
+
   return (
     <main className="launch-scene">
       {/* 3D Environment */}
       <div className="launch-environment">
         <Canvas
           camera={{
-            position: [0, 2, 9],
-            fov: 40,
+            position: [0, 3, 12],
+            fov: 45,
           }}
           shadows
           gl={{ antialias: true }}
@@ -48,42 +55,10 @@ export default function LaunchScene({ missionId, onLaunch, onBack }) {
           <directionalLight position={[4, 8, 5]} intensity={2} castShadow />
 
           {/* Launch Tower */}
-          <LaunchTower position={[0, 0, -1.5]} scale={[4.2, 4.2, 1]} />
+          <LaunchTower position={[0, 1, -2.5]} scale={[6.5, 6.5, 1]} />
 
           {/* Rocket */}
           {/* <Rocket /> */}
-          {/* Rocket Placeholder */}
-          <group position={[0, 0, 0]}>
-            {/* Main Body */}
-            <mesh castShadow position={[0, 0, 0]}>
-              <cylinderGeometry args={[0.25, 0.25, 2.5, 32]} />
-              <meshStandardMaterial
-                color="#dce6ec"
-                metalness={0.5}
-                roughness={0.35}
-              />
-            </mesh>
-
-            {/* Nose Cone */}
-            <mesh castShadow position={[0, 1.5, 0]}>
-              <coneGeometry args={[0.25, 0.6, 32]} />
-              <meshStandardMaterial color="#80d9f2" />
-            </mesh>
-
-            {/* Engine */}
-            <mesh castShadow position={[0, -1.4, 0]}>
-              <cylinderGeometry args={[0.15, 0.25, 0.45, 32]} />
-              <meshStandardMaterial color="#657889" />
-            </mesh>
-
-            {/* Side Boosters */}
-            {[-1, 1].map((side) => (
-              <mesh key={side} castShadow position={[side * 0.42, -0.1, 0]}>
-                <cylinderGeometry args={[0.12, 0.12, 1.8, 24]} />
-                <meshStandardMaterial color="#aab9c5" />
-              </mesh>
-            ))}
-          </group>
 
           {/* Ground */}
           <mesh
@@ -99,29 +74,29 @@ export default function LaunchScene({ missionId, onLaunch, onBack }) {
 
       {/* Top HUD */}
       <header className="launch-header">
-        <button className="level-label" type="button" onClick={onBack}>
-          Level 1
+        <button className="back-button" type="button" onClick={onBack}>
+          ← Back
         </button>
-
-        <button className="settings-button">⚙</button>
       </header>
 
       {/* Mission Brief */}
       <section className="launch-brief">
-        <h2>Brief:</h2>
+        <span className="mission-number">{mission.number}</span>
 
-        <p>
-          The rival space program secured the milestone 23 days ago completed a
-          full orbit. We are behind in the space race. We need a successful
-          mission, and we need it now.
-        </p>
+        <h1 className="mission-title">{mission.title}</h1>
+
+        <div className="brief-divider" />
+
+        <h2>Brief:</h2>
+        <p>{mission.brief}</p>
 
         <h2>Objectives:</h2>
-
         <ul>
-          <li>Objective 1: Ignition &amp; Ascent</li>
-          <li>Objective 2: Suborbital Maneuver</li>
-          <li>Objective 3: Atmospheric Descent</li>
+          {mission.objectives.map((objective, index) => (
+            <li key={index}>
+              Objective {index + 1}: {objective}
+            </li>
+          ))}
         </ul>
       </section>
 
@@ -141,6 +116,8 @@ export default function LaunchScene({ missionId, onLaunch, onBack }) {
         <div className="inventory-items">
           {rocketParts.map((part) => {
             const item = ROCKET_PARTS[part.key];
+
+            if (!item) return null;
 
             return (
               <button
@@ -174,6 +151,7 @@ export default function LaunchScene({ missionId, onLaunch, onBack }) {
             handleRemovePart(selectedPart);
             setSelectedPart(null);
           }}
+          aria-label="Remove selected part"
         >
           −
         </button>

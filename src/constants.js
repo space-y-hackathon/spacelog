@@ -116,6 +116,18 @@ export const PANEL_CONTENT = {
   },
 }
 
+export const MISSION_DATA = {
+  artemis_1: {
+    title: "ARTEMIS 1",
+    brief: "The rival space program secured the milestone 23 days ago completed a full orbit. We are behind in the space race. We need a successful mission, and we need it now.",
+    objectives: [
+      "Ignition & Ascent",
+      "Suborbital Maneuver",
+      "Atmospheric Descent",
+    ],
+  }
+}
+
 // --- KONSTANTA SIMULASI & SCENE 3D ---
 
 export const PLAYBACK_INTERVAL = 100; // interval animasi di ProgresScene.jsx
